@@ -1,0 +1,44 @@
+[
+  {
+    "platform": "MoltJobs",
+    "automatedCheck": "None documented. A job's `acceptanceCriteria` array is human-readable text (e.g. \"outputData.url returns HTTP 200\"), but nothing in the public API actually runs that check automatically -- the poster reviews and manually accepts/rejects submissions. Confirmed directly: as of testing, only 3 of the poster's 50 posted jobs on this platform have ever reached COMPLETED status, consistent with a manual, unhurried review process rather than automated approval.",
+    "deadLinkPolicy": "Not documented. The platform stores only the URL an agent supplies in outputData.url; there is no re-hosting or archival step. If the link dies after acceptance, nothing in the public API or docs describes a remedy.",
+    "fabricationDeterrent": "Escrow is funded on-chain (visible as escrowTxHash) before a job opens for bidding, so a rejected or fabricated submission simply forfeits that bid with no payout -- the deterrent is entirely economic (wasted effort), not technical detection.",
+    "sourceUrl": "https://api.moltjobs.io/docs-json"
+  },
+  {
+    "platform": "dealwork.ai",
+    "automatedCheck": "Two-step submission flow (POST /contracts/{id}/deliverables, then a SUBMIT_WORK event) exists in the documented API, but the skill.md protocol does not describe any automated grading -- acceptance criteria on the jobs observed were listed as \"human_review\" explicitly.",
+    "deadLinkPolicy": "Not documented in the public skill.md or API docs.",
+    "fabricationDeterrent": "Not documented beyond the human-review step itself; no automated authenticity check found.",
+    "sourceUrl": "https://dealwork.ai/skill.md"
+  },
+  {
+    "platform": "Superteam Earn",
+    "automatedCheck": "None for the work itself -- submissions to bounties are judged by the sponsor. The platform's real automated gate is upstream of work quality: an agent cannot receive payment at all until a human completes identity verification (KYC) via a claim link, confirmed directly during registration.",
+    "deadLinkPolicy": "Not documented for submission content.",
+    "fabricationDeterrent": "The KYC requirement means every payout is tied to a real, verified human identity -- fabricated or automated spam submissions still require a verified person behind the wallet that receives funds, which is a stronger identity-side deterrent than most platforms checked, even though it does nothing to verify the work's content.",
+    "sourceUrl": "https://earn.superteam.fun/api/agents"
+  },
+  {
+    "platform": "opentask.ai",
+    "automatedCheck": "Not documented. The platform describes a manual workflow: \"Review the work, keep messages and work files with the contract, then review the result or request changes,\" followed by \"Review the result, confirm payment, and accept the work.\" No automated verification step is mentioned anywhere in the public site content.",
+    "deadLinkPolicy": "Not documented. The site states \"Nobody holds your money\" (payments settle directly between parties, no platform escrow), but says nothing about what happens if a deliverable becomes unreachable after payment.",
+    "fabricationDeterrent": "Not documented -- verification and dispute handling are left entirely to the two parties, with no platform-level mechanism described.",
+    "sourceUrl": "https://opentask.ai"
+  },
+  {
+    "platform": "execution.market",
+    "automatedCheck": "The most sophisticated automated system found in this survey: a documented two-ring system combining \"Ring 1 (PHOTINT) forensic authenticity checks\" on submitted evidence with \"Ring 2 (LLM) semantic completion checks\" that grade whether a deliverable actually satisfies the task, on an A-F scale, for bounties over $1. Manual human review by the publisher is still the default final gate -- the automated rings inform but do not auto-release funds.",
+    "deadLinkPolicy": "Explicitly solved: \"a delivery_url pointing off-host is downloaded ONCE at submit and re-hosted on our storage, before redaction, so the stored link is durable and no credential ever reaches the DB.\" This is the only platform surveyed that actively defends against link rot by re-hosting content at submission time rather than trusting an external URL to stay live.",
+    "fabricationDeterrent": "Combination of forensic authenticity checks (Ring 1) and LLM semantic grading (Ring 2), plus a 13% platform fee taken only on release -- both technical and economic deterrents are present, the strongest combination found in this survey.",
+    "sourceUrl": "https://execution.market"
+  },
+  {
+    "platform": "HackerOne (via the curl project's program specifically)",
+    "automatedCheck": "None -- fully human triage. This is included specifically because curl's real, recent experience shows what happens without automated verification: AI-generated submission volume spiked to 8x normal, ~20% of all reports were AI-assisted, and the real-vulnerability validity rate collapsed to around 5%. curl ended its HackerOne program entirely on 2026-01-31 as a direct result, moving to unpaid GitHub-only reporting.",
+    "deadLinkPolicy": "Not applicable -- vulnerability reports are text/PoC submissions reviewed at time of triage, not externally-hosted deliverable URLs.",
+    "fabricationDeterrent": "Purely reputational/punitive, not automated: curl's security.txt states \"We will ban you and ridicule you in public if you waste our time on crap reports.\" This is the clearest real-world evidence in this survey of what a pure-human-review, no-automated-check system costs at scale once AI-assisted submission volume rises -- the program shut down rather than scale triage capacity.",
+    "sourceUrl": "https://www.bleepingcomputer.com/news/security/curl-ending-bug-bounty-program-after-flood-of-ai-slop-reports/"
+  }
+]
