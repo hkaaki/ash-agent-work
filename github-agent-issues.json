@@ -1,0 +1,202 @@
+[
+  {
+    "repoUrl": "https://github.com/Abhigyan-Shekhar/Waggle-mcp",
+    "issueUrl": "https://github.com/Abhigyan-Shekhar/Waggle-mcp/issues/631",
+    "title": "docs(troubleshooting): document Windows path quoting examples",
+    "category": "docs",
+    "rationale": "Pure documentation addition with no code change or design judgment required.",
+    "estimatedUsd": 10
+  },
+  {
+    "repoUrl": "https://github.com/eclipse-score/docs-as-code",
+    "issueUrl": "https://github.com/eclipse-score/docs-as-code/issues/753",
+    "title": "Bug: pre-commit / basedpyright config error",
+    "category": "bug fix",
+    "rationale": "A config-file error with a specific, reproducible failure -- fixable by correcting the config, no product decision needed.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/hilt21/Adaptive-Harness",
+    "issueUrl": "https://github.com/hilt21/Adaptive-Harness/issues/1",
+    "title": "docs: add a five-minute Node.js quickstart",
+    "category": "docs",
+    "rationale": "Self-contained documentation task with a clear scope (a quickstart guide), no ambiguity.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/meshery/meshery",
+    "issueUrl": "https://github.com/meshery/meshery/issues/21722",
+    "title": "[UI] Fix inconsistent tab heights on small screens",
+    "category": "small bug fix",
+    "rationale": "A concrete, visually verifiable CSS/layout bug with no design decision -- the correct behavior (consistent heights) is unambiguous.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/kubernetes/minikube",
+    "issueUrl": "https://github.com/kubernetes/minikube/issues/23581",
+    "title": "cri-dockerd updated uses pre-release",
+    "category": "dependency bump",
+    "rationale": "Pinning to a stable released version instead of a pre-release is a mechanical dependency fix.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/wemake-services/django-modern-rest",
+    "issueUrl": "https://github.com/wemake-services/django-modern-rest/issues/1364",
+    "title": "`JWToken.encode` raises `InternalServerError`, an HTTP-layer exception",
+    "category": "bug fix",
+    "rationale": "A specific, wrongly-typed exception being raised from a non-HTTP layer -- a scoped fix with a clear correct outcome.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/ivohofland/fair.yoga",
+    "issueUrl": "https://github.com/ivohofland/fair.yoga/issues/400",
+    "title": "A student cannot edit their own name (the schema and API accept it, no input exists)",
+    "category": "small bug fix",
+    "rationale": "Backend already supports the change; only a missing frontend input field needs adding -- no design judgment required, the fix is a form field.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/WayfireWM/wf-shell",
+    "issueUrl": "https://github.com/WayfireWM/wf-shell/issues/555",
+    "title": "panel : slow startup with ddcutil",
+    "category": "bug fix",
+    "rationale": "A performance bug traced to a specific dependency (ddcutil) with a measurable fix outcome (faster startup).",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/shipwright-io/build",
+    "issueUrl": "https://github.com/shipwright-io/build/issues/2134",
+    "title": "[CLEANUP] Moving the PipelineRun test logic from CI to Makefile and invoking them from the CI",
+    "category": "CI/build cleanup",
+    "rationale": "Mechanical refactor moving existing logic between files with no behavior change intended.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/aws/amazon-network-policy-controller-k8s",
+    "issueUrl": "https://github.com/aws/amazon-network-policy-controller-k8s/issues/258",
+    "title": "Filter headless Services from the informer cache via spec.clusterIP field selector",
+    "category": "small bug fix",
+    "rationale": "A precisely specified filtering change (field selector) with a clear technical outcome.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/actualbudget/actual",
+    "issueUrl": "https://github.com/actualbudget/actual/issues/8584",
+    "title": "[Bug]: Installing npm @actual-app/sync-server ends up with warnings/errors",
+    "category": "bug fix",
+    "rationale": "A reproducible install-time warning/error with a defined success criterion (clean install).",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/ufosc/BytesOfLoveWebsite",
+    "issueUrl": "https://github.com/ufosc/BytesOfLoveWebsite/issues/38",
+    "title": "Create Custom Themed Right-Side Scrollbar",
+    "category": "small feature",
+    "rationale": "Self-contained CSS styling task with an existing design language to match -- no open-ended product decision.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/padok-team/burrito",
+    "issueUrl": "https://github.com/padok-team/burrito/issues/42",
+    "title": "Create a validating webhook to validate resources before they are applied",
+    "category": "small feature",
+    "rationale": "A scoped, mechanically specified Kubernetes admission webhook with defined validation rules, not an open design problem.",
+    "estimatedUsd": 20
+  },
+  {
+    "repoUrl": "https://github.com/commons-app/apps-android-commons",
+    "issueUrl": "https://github.com/commons-app/apps-android-commons/issues/6947",
+    "title": "\"Download unsuccessful\" when downloading image from the app",
+    "category": "bug fix",
+    "rationale": "A specific reproducible failure with clear correct behavior (successful download).",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/Federicoand98/mani",
+    "issueUrl": "https://github.com/Federicoand98/mani/issues/13",
+    "title": "SQLite adapter for the run journal",
+    "category": "small feature",
+    "rationale": "Implementing a defined adapter interface against an existing journal abstraction -- mechanical, not a design call.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/reticlehq/reticle",
+    "issueUrl": "https://github.com/reticlehq/reticle/issues/605",
+    "title": "[agent] audit instructions reference reticle_crawl, which no longer exists",
+    "category": "docs",
+    "rationale": "A stale reference cleanup in documentation/instructions -- find and correct, no ambiguity.",
+    "estimatedUsd": 10
+  },
+  {
+    "repoUrl": "https://github.com/mloda-ai/mloda",
+    "issueUrl": "https://github.com/mloda-ai/mloda/issues/1230",
+    "title": "KeyError in execution plan child pruning on diamond dependency graphs",
+    "category": "bug fix",
+    "rationale": "A specific reproducible crash (KeyError) tied to a described graph shape (diamond dependencies) -- debuggable and fixable without product input.",
+    "estimatedUsd": 20
+  },
+  {
+    "repoUrl": "https://github.com/Open-Resin-Alliance/DragonFruit",
+    "issueUrl": "https://github.com/Open-Resin-Alliance/DragonFruit/issues/631",
+    "title": "[FEAT] SDCP Transfer Cancel button",
+    "category": "small feature",
+    "rationale": "A single, clearly named UI control tied to an existing protocol (SDCP) operation -- narrow scope.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/Forge-researchlab/forge-kernels",
+    "issueUrl": "https://github.com/Forge-researchlab/forge-kernels/issues/11",
+    "title": "GeGLU: fp64 gradcheck is deferred",
+    "category": "test coverage",
+    "rationale": "Enabling a currently-deferred gradient check test -- a defined, verifiable task with a pass/fail outcome.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/ColinGPT9/clips-studio",
+    "issueUrl": "https://github.com/ColinGPT9/clips-studio/issues/91",
+    "title": "Some UI text is hard-coded in English and never reaches the translation system",
+    "category": "small bug fix",
+    "rationale": "Mechanical i18n cleanup: find hard-coded strings and route them through the existing translation system.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/hensu-project/hensu",
+    "issueUrl": "https://github.com/hensu-project/hensu/issues/70",
+    "title": "[Feature] Migrate workflow definitions to .kts with global IDE support",
+    "category": "refactor",
+    "rationale": "A defined migration from one config format to another with existing definitions as the source of truth -- mechanical translation, not new design.",
+    "estimatedUsd": 20
+  },
+  {
+    "repoUrl": "https://github.com/kgoedecke/doop",
+    "issueUrl": "https://github.com/kgoedecke/doop/issues/90",
+    "title": "Pinch to zoom on iOS does not work",
+    "category": "bug fix",
+    "rationale": "A specific, testable platform bug (iOS pinch-to-zoom) with a clear pass/fail outcome.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/SakarZaidan/lumina",
+    "issueUrl": "https://github.com/SakarZaidan/lumina/issues/43",
+    "title": "README makes claims the code does not support",
+    "category": "docs",
+    "rationale": "Reconciling documentation with actual code behavior -- verify claims, correct the README, no design judgment.",
+    "estimatedUsd": 10
+  },
+  {
+    "repoUrl": "https://github.com/JabRef/jabref",
+    "issueUrl": "https://github.com/JabRef/jabref/issues/16075",
+    "title": "Support multiple customized preview styles",
+    "category": "small feature",
+    "rationale": "An established, well-scoped OSS project (JabRef) with a maintainer-defined feature request and existing preview-style infrastructure to extend.",
+    "estimatedUsd": 20
+  },
+  {
+    "repoUrl": "https://github.com/majmichu1/UScreen",
+    "issueUrl": "https://github.com/majmichu1/UScreen/issues/3",
+    "title": "Test the v1.1.0 PKGBUILD end to end on a real Arch install (UScreen itself already works on Arch)",
+    "category": "test coverage",
+    "rationale": "A defined verification task (run the install, confirm it works) with a clear pass/fail result, no ambiguity.",
+    "estimatedUsd": 10
+  }
+]
