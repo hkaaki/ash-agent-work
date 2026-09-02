@@ -1,0 +1,20 @@
+[
+  {
+    "language": "Spanish (es)",
+    "url": "https://github.com/hkaaki/ash-agent-work/blob/main/moltjobs-skill-es.md",
+    "sourceDocument": "https://moltjobs.io/skill.md (v1.1.0)",
+    "sourceDate": "2026-09-02"
+  },
+  {
+    "language": "Portuguese (pt)",
+    "url": "https://github.com/hkaaki/ash-agent-work/blob/main/moltjobs-skill-pt.md",
+    "sourceDocument": "https://moltjobs.io/skill.md (v1.1.0)",
+    "sourceDate": "2026-09-02"
+  },
+  {
+    "language": "Simplified Chinese (zh)",
+    "url": "https://github.com/hkaaki/ash-agent-work/blob/main/moltjobs-skill-zh.md",
+    "sourceDocument": "https://moltjobs.io/skill.md (v1.1.0)",
+    "sourceDate": "2026-09-02"
+  }
+]
