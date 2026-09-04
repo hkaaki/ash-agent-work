@@ -8,22 +8,6 @@
     "estimatedUsd": 10
   },
   {
-    "repoUrl": "https://github.com/eclipse-score/docs-as-code",
-    "issueUrl": "https://github.com/eclipse-score/docs-as-code/issues/753",
-    "title": "Bug: pre-commit / basedpyright config error",
-    "category": "bug fix",
-    "rationale": "A config-file error with a specific, reproducible failure -- fixable by correcting the config, no product decision needed.",
-    "estimatedUsd": 15
-  },
-  {
-    "repoUrl": "https://github.com/hilt21/Adaptive-Harness",
-    "issueUrl": "https://github.com/hilt21/Adaptive-Harness/issues/1",
-    "title": "docs: add a five-minute Node.js quickstart",
-    "category": "docs",
-    "rationale": "Self-contained documentation task with a clear scope (a quickstart guide), no ambiguity.",
-    "estimatedUsd": 15
-  },
-  {
     "repoUrl": "https://github.com/meshery/meshery",
     "issueUrl": "https://github.com/meshery/meshery/issues/21722",
     "title": "[UI] Fix inconsistent tab heights on small screens",
@@ -45,14 +29,6 @@
     "title": "`JWToken.encode` raises `InternalServerError`, an HTTP-layer exception",
     "category": "bug fix",
     "rationale": "A specific, wrongly-typed exception being raised from a non-HTTP layer -- a scoped fix with a clear correct outcome.",
-    "estimatedUsd": 15
-  },
-  {
-    "repoUrl": "https://github.com/ivohofland/fair.yoga",
-    "issueUrl": "https://github.com/ivohofland/fair.yoga/issues/400",
-    "title": "A student cannot edit their own name (the schema and API accept it, no input exists)",
-    "category": "small bug fix",
-    "rationale": "Backend already supports the change; only a missing frontend input field needs adding -- no design judgment required, the fix is a form field.",
     "estimatedUsd": 15
   },
   {
@@ -112,30 +88,6 @@
     "estimatedUsd": 15
   },
   {
-    "repoUrl": "https://github.com/Federicoand98/mani",
-    "issueUrl": "https://github.com/Federicoand98/mani/issues/13",
-    "title": "SQLite adapter for the run journal",
-    "category": "small feature",
-    "rationale": "Implementing a defined adapter interface against an existing journal abstraction -- mechanical, not a design call.",
-    "estimatedUsd": 15
-  },
-  {
-    "repoUrl": "https://github.com/reticlehq/reticle",
-    "issueUrl": "https://github.com/reticlehq/reticle/issues/605",
-    "title": "[agent] audit instructions reference reticle_crawl, which no longer exists",
-    "category": "docs",
-    "rationale": "A stale reference cleanup in documentation/instructions -- find and correct, no ambiguity.",
-    "estimatedUsd": 10
-  },
-  {
-    "repoUrl": "https://github.com/mloda-ai/mloda",
-    "issueUrl": "https://github.com/mloda-ai/mloda/issues/1230",
-    "title": "KeyError in execution plan child pruning on diamond dependency graphs",
-    "category": "bug fix",
-    "rationale": "A specific reproducible crash (KeyError) tied to a described graph shape (diamond dependencies) -- debuggable and fixable without product input.",
-    "estimatedUsd": 20
-  },
-  {
     "repoUrl": "https://github.com/Open-Resin-Alliance/DragonFruit",
     "issueUrl": "https://github.com/Open-Resin-Alliance/DragonFruit/issues/631",
     "title": "[FEAT] SDCP Transfer Cancel button",
@@ -168,22 +120,6 @@
     "estimatedUsd": 20
   },
   {
-    "repoUrl": "https://github.com/kgoedecke/doop",
-    "issueUrl": "https://github.com/kgoedecke/doop/issues/90",
-    "title": "Pinch to zoom on iOS does not work",
-    "category": "bug fix",
-    "rationale": "A specific, testable platform bug (iOS pinch-to-zoom) with a clear pass/fail outcome.",
-    "estimatedUsd": 15
-  },
-  {
-    "repoUrl": "https://github.com/SakarZaidan/lumina",
-    "issueUrl": "https://github.com/SakarZaidan/lumina/issues/43",
-    "title": "README makes claims the code does not support",
-    "category": "docs",
-    "rationale": "Reconciling documentation with actual code behavior -- verify claims, correct the README, no design judgment.",
-    "estimatedUsd": 10
-  },
-  {
     "repoUrl": "https://github.com/JabRef/jabref",
     "issueUrl": "https://github.com/JabRef/jabref/issues/16075",
     "title": "Support multiple customized preview styles",
@@ -192,11 +128,75 @@
     "estimatedUsd": 20
   },
   {
-    "repoUrl": "https://github.com/majmichu1/UScreen",
-    "issueUrl": "https://github.com/majmichu1/UScreen/issues/3",
-    "title": "Test the v1.1.0 PKGBUILD end to end on a real Arch install (UScreen itself already works on Arch)",
-    "category": "test coverage",
-    "rationale": "A defined verification task (run the install, confirm it works) with a clear pass/fail result, no ambiguity.",
+    "repoUrl": "https://github.com/inference-gateway/docs",
+    "issueUrl": "https://github.com/inference-gateway/docs/issues/661",
+    "title": "[DOCS] Replace ENABLE_VISION with VISION_ENABLED across docs",
+    "category": "docs",
+    "rationale": "Pure find-and-replace documentation consistency fix, no design judgment required.",
     "estimatedUsd": 10
+  },
+  {
+    "repoUrl": "https://github.com/mesteban07/skills-scale-institutional-knowledge-using-copilot-spaces",
+    "issueUrl": "https://github.com/mesteban07/skills-scale-institutional-knowledge-using-copilot-spaces/issues/2",
+    "title": "[Process Doc Update]: Create README for OctoAcme Project Management Docs with Process Summary and Links",
+    "category": "docs",
+    "rationale": "Scoped README creation task with a clear content brief already specified in the issue.",
+    "estimatedUsd": 12
+  },
+  {
+    "repoUrl": "https://github.com/calcit-lang/calcit",
+    "issueUrl": "https://github.com/calcit-lang/calcit/issues/748",
+    "title": "Upgrade explore-quaternary to Calcit 0.13.77",
+    "category": "dependency-bump",
+    "rationale": "Single-package version bump with a clear target version, mechanical change.",
+    "estimatedUsd": 10
+  },
+  {
+    "repoUrl": "https://github.com/kubestellar/homebrew-tap",
+    "issueUrl": "https://github.com/kubestellar/homebrew-tap/issues/334",
+    "title": "[quality] validate-formulae CI has no coverage measurement or gate",
+    "category": "broken-ci",
+    "rationale": "Scoped CI-quality gap with a named workflow to fix, no product decision needed.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/synentra/synentra",
+    "issueUrl": "https://github.com/synentra/synentra/issues/482",
+    "title": "Simplify response header loops using LINQ `Where`",
+    "category": "small-refactor",
+    "rationale": "Localized code-cleanup task with the exact refactor pattern named in the title.",
+    "estimatedUsd": 10
+  },
+  {
+    "repoUrl": "https://github.com/rtk-ai/rtk",
+    "issueUrl": "https://github.com/rtk-ai/rtk/issues/2735",
+    "title": "bug: rtk golangci-lint run returns exit 0 when lint issues are found (exit code masked)",
+    "category": "small-bug-fix",
+    "rationale": "Narrow, well-diagnosed exit-code bug with the root cause already named in the title.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/k8sgpt-ai/k8sgpt-operator",
+    "issueUrl": "https://github.com/k8sgpt-ai/k8sgpt-operator/issues/767",
+    "title": "[Feature]: Support tolerations in K8sGPT spec and operator deployment",
+    "category": "small-feature",
+    "rationale": "Bounded feature addition (a single new spec field) on an established operator pattern.",
+    "estimatedUsd": 18
+  },
+  {
+    "repoUrl": "https://github.com/5G-MAG/rt-libflute",
+    "issueUrl": "https://github.com/5G-MAG/rt-libflute/issues/76",
+    "title": "ctest at the build root discovers no tests and exits successfully",
+    "category": "broken-ci",
+    "rationale": "Build-configuration bug (test discovery silently no-ops) with a clear, verifiable fix target.",
+    "estimatedUsd": 15
+  },
+  {
+    "repoUrl": "https://github.com/Hebbian-Robotics/hflow",
+    "issueUrl": "https://github.com/Hebbian-Robotics/hflow/issues/408",
+    "title": "The native overlay manifest parse stage refuses four things and none of them are tested",
+    "category": "test-coverage",
+    "rationale": "Missing-test-coverage issue with the four untested rejection cases already enumerated.",
+    "estimatedUsd": 15
   }
 ]
