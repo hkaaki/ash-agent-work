@@ -1,0 +1,227 @@
+{
+  "schema": "frantic.evidence.v1",
+  "bounty": 79,
+  "title": "runx skill: CRM cleanup",
+  "worker": {
+    "github": "hkaaki",
+    "frantic_agent": "agent-76220f",
+    "operator": "@hkaaki"
+  },
+  "summary": "Published hkaaki/crm-cleanup@0.2.0 from PR head cbbbb45f on runxhq/runx#459. Hosted harness passed 4/4. Post-publish dogfood of the installed registry package fetched live Globex records from GitHub raw (web_fetch, not a pasted fixture), applied 2 allowlisted field updates traced to transcript quotes, and executed them through mock-crm.v1 with a sealed before/after write_result. Receipt sha256:c554a805b1ae0d0a689f3338a21f53ee70f2468a0a491034f53b12111258e368 verifies valid=true. The skill is javascript-native, requires_adapter=false, and does not persist to a live CRM.",
+  "observations": [
+    "runx CLI version: runx-cli 0.9.0 (floor is runx-cli 0.6.14 or newer). The same binary ran publish, install, local harness, dogfood, and verify.",
+    "publisher owner: hkaaki",
+    "package name: crm-cleanup (exact, not a near-name)",
+    "X.yaml document version: 0.2.0",
+    "registry version / registry ref: hkaaki/crm-cleanup@0.2.0",
+    "registry digest: sha256:11541e15a7d15d9e4b3dc958f930a55a23eef05f49a1d23edb0834e5fc508498",
+    "public_url: https://runx.ai/x/hkaaki/crm-cleanup@0.2.0",
+    "pr_url: https://github.com/runxhq/runx/pull/459",
+    "source_url: https://github.com/hkaaki/runx/tree/cbbbb45fdc60d050ad402a0b515a3b930b7dc0ab/skills/crm-cleanup",
+    "raw x_yaml: https://raw.githubusercontent.com/hkaaki/runx/cbbbb45fdc60d050ad402a0b515a3b930b7dc0ab/skills/crm-cleanup/X.yaml",
+    "raw skill_md: https://raw.githubusercontent.com/hkaaki/runx/cbbbb45fdc60d050ad402a0b515a3b930b7dc0ab/skills/crm-cleanup/SKILL.md",
+    "verification_json: https://hkaaki.github.io/ash-agent-work/frantic-79-crm-cleanup/verification.json",
+    "publish method: runx login --provider github --for publish --from-gh, then runx registry publish /absolute/path/skills/crm-cleanup/SKILL.md --registry=https://api.runx.ai (omit --owner and --upsert; those trip the admin publish token on runx-cli 0.9.0). Relative paths and -j are parsed as extra skill paths.",
+    "install command: runx add hkaaki/crm-cleanup@0.2.0 --registry https://api.runx.ai",
+    "local harness before publish: runx harness ./skills/crm-cleanup passed 4/4, assertion_error_count 0",
+    "hosted harness status: passed (checks_passed 4, checks_failed 0) at https://runx.ai/x/hkaaki/crm-cleanup@0.2.0#harness ; latest_run 2026-09-11T17:04:23.575Z",
+    "harness case names: crm-cleanup-applies-traced-updates (sealed), crm-cleanup-noop-executes-nothing (sealed, executed false), crm-cleanup-rejects-unlisted-field (sealed, owner rejected as outside allowlist), crm-cleanup-needs-transcript (failure, expected)",
+    "dogfood command: runx skill hkaaki/crm-cleanup@0.2.0 --registry https://api.runx.ai --inputs input.json --json --receipt-dir receipts",
+    "receipt id: sha256:c554a805b1ae0d0a689f3338a21f53ee70f2468a0a491034f53b12111258e368",
+    "receipt_ref: runx:receipt:sha256:c554a805b1ae0d0a689f3338a21f53ee70f2468a0a491034f53b12111258e368",
+    "runx verify verdict: valid=true via `runx verify --receipt receipts/sha256-c554a805b1ae0d0a689f3338a21f53ee70f2468a0a491034f53b12111258e368.json --allow-local-development-signatures --json` (local CLI receipts use runtime-skeleton signatures; production verifier env is not present on this operator machine)",
+    "source read at runtime: kind=web_fetch count=1 ref=https://raw.githubusercontent.com/hkaaki/ash-agent-work/2de5fbbc757fdd07835d5affe674ef1c45bf8afa/frantic-79-crm-cleanup/globex.json (GitHub raw JSON, not a pasted fixture argument and not fixture.runx.invalid)",
+    "mapped field_updates: acct-globex.account_status healthy -> at_risk (quote: the rollout stalled and they want an executive review before renewing); acct-globex.next_action none -> send the Q3 usage report by Friday (quote: send the Q3 usage report by Friday)",
+    "executed write_result: transport=mock-crm.v1 executed=true schema=runx.crm_write_result.v1 ; before=[{id:acct-globex, account_status:healthy, next_action:none}] after=[{id:acct-globex, account_status:at_risk, next_action:send the Q3 usage report by Friday}]",
+    "no-op path: harness case crm-cleanup-noop-executes-nothing seals decision=no_action with write_result.executed=false and applied=[] when the transcript has no actionable change",
+    "typed inputs used: crm_source (kind web_fetch + url + allowlist), transcript, crm_schema.allowed_fields",
+    "typed outputs returned: takeaways[], field_updates[] keyed to crm_schema fields, write_result{before,after}, crm_cleanup_result",
+    "decision: applied ; rejected_updates: [] ; validation.status: pass",
+    "new user path with no private context: runx add hkaaki/crm-cleanup@0.2.0 --registry https://api.runx.ai ; write JSON with crm_source.url pointing at live records, transcript, and crm_schema.allowed_fields ; runx skill hkaaki/crm-cleanup@0.2.0 --registry https://api.runx.ai --inputs input.json --json --receipt-dir receipts ; runx verify --receipt <receipt.json> --allow-local-development-signatures --json"
+  ],
+  "items": [
+    "runx CLI version: runx-cli 0.9.0 (floor is runx-cli 0.6.14 or newer). The same binary ran publish, install, local harness, dogfood, and verify.",
+    "publisher owner: hkaaki",
+    "package name: crm-cleanup (exact, not a near-name)",
+    "X.yaml document version: 0.2.0",
+    "registry version / registry ref: hkaaki/crm-cleanup@0.2.0",
+    "registry digest: sha256:11541e15a7d15d9e4b3dc958f930a55a23eef05f49a1d23edb0834e5fc508498",
+    "public_url: https://runx.ai/x/hkaaki/crm-cleanup@0.2.0",
+    "pr_url: https://github.com/runxhq/runx/pull/459",
+    "source_url: https://github.com/hkaaki/runx/tree/cbbbb45fdc60d050ad402a0b515a3b930b7dc0ab/skills/crm-cleanup",
+    "raw x_yaml: https://raw.githubusercontent.com/hkaaki/runx/cbbbb45fdc60d050ad402a0b515a3b930b7dc0ab/skills/crm-cleanup/X.yaml",
+    "raw skill_md: https://raw.githubusercontent.com/hkaaki/runx/cbbbb45fdc60d050ad402a0b515a3b930b7dc0ab/skills/crm-cleanup/SKILL.md",
+    "verification_json: https://hkaaki.github.io/ash-agent-work/frantic-79-crm-cleanup/verification.json",
+    "publish method: runx login --provider github --for publish --from-gh, then runx registry publish /absolute/path/skills/crm-cleanup/SKILL.md --registry=https://api.runx.ai (omit --owner and --upsert; those trip the admin publish token on runx-cli 0.9.0). Relative paths and -j are parsed as extra skill paths.",
+    "install command: runx add hkaaki/crm-cleanup@0.2.0 --registry https://api.runx.ai",
+    "local harness before publish: runx harness ./skills/crm-cleanup passed 4/4, assertion_error_count 0",
+    "hosted harness status: passed (checks_passed 4, checks_failed 0) at https://runx.ai/x/hkaaki/crm-cleanup@0.2.0#harness ; latest_run 2026-09-11T17:04:23.575Z",
+    "harness case names: crm-cleanup-applies-traced-updates (sealed), crm-cleanup-noop-executes-nothing (sealed, executed false), crm-cleanup-rejects-unlisted-field (sealed, owner rejected as outside allowlist), crm-cleanup-needs-transcript (failure, expected)",
+    "dogfood command: runx skill hkaaki/crm-cleanup@0.2.0 --registry https://api.runx.ai --inputs input.json --json --receipt-dir receipts",
+    "receipt id: sha256:c554a805b1ae0d0a689f3338a21f53ee70f2468a0a491034f53b12111258e368",
+    "receipt_ref: runx:receipt:sha256:c554a805b1ae0d0a689f3338a21f53ee70f2468a0a491034f53b12111258e368",
+    "runx verify verdict: valid=true via `runx verify --receipt receipts/sha256-c554a805b1ae0d0a689f3338a21f53ee70f2468a0a491034f53b12111258e368.json --allow-local-development-signatures --json` (local CLI receipts use runtime-skeleton signatures; production verifier env is not present on this operator machine)",
+    "source read at runtime: kind=web_fetch count=1 ref=https://raw.githubusercontent.com/hkaaki/ash-agent-work/2de5fbbc757fdd07835d5affe674ef1c45bf8afa/frantic-79-crm-cleanup/globex.json (GitHub raw JSON, not a pasted fixture argument and not fixture.runx.invalid)",
+    "mapped field_updates: acct-globex.account_status healthy -> at_risk (quote: the rollout stalled and they want an executive review before renewing); acct-globex.next_action none -> send the Q3 usage report by Friday (quote: send the Q3 usage report by Friday)",
+    "executed write_result: transport=mock-crm.v1 executed=true schema=runx.crm_write_result.v1 ; before=[{id:acct-globex, account_status:healthy, next_action:none}] after=[{id:acct-globex, account_status:at_risk, next_action:send the Q3 usage report by Friday}]",
+    "no-op path: harness case crm-cleanup-noop-executes-nothing seals decision=no_action with write_result.executed=false and applied=[] when the transcript has no actionable change",
+    "typed inputs used: crm_source (kind web_fetch + url + allowlist), transcript, crm_schema.allowed_fields",
+    "typed outputs returned: takeaways[], field_updates[] keyed to crm_schema fields, write_result{before,after}, crm_cleanup_result",
+    "decision: applied ; rejected_updates: [] ; validation.status: pass",
+    "new user path with no private context: runx add hkaaki/crm-cleanup@0.2.0 --registry https://api.runx.ai ; write JSON with crm_source.url pointing at live records, transcript, and crm_schema.allowed_fields ; runx skill hkaaki/crm-cleanup@0.2.0 --registry https://api.runx.ai --inputs input.json --json --receipt-dir receipts ; runx verify --receipt <receipt.json> --allow-local-development-signatures --json"
+  ],
+  "cli": {
+    "binary": "runx-cli 0.9.0",
+    "commands": {
+      "version": "runx --version",
+      "login": "runx login --provider github --for publish --from-gh",
+      "publish": "runx registry publish /tmp/runx-crm-cleanup/skills/crm-cleanup/SKILL.md --registry=https://api.runx.ai --version 0.2.0",
+      "install": "runx add hkaaki/crm-cleanup@0.2.0 --registry https://api.runx.ai",
+      "harness_local": "runx harness ./skills/crm-cleanup --json",
+      "dogfood": "runx skill hkaaki/crm-cleanup@0.2.0 --registry https://api.runx.ai --inputs input.json --json --receipt-dir receipts",
+      "verify": "runx verify --receipt receipts/sha256-c554a805b1ae0d0a689f3338a21f53ee70f2468a0a491034f53b12111258e368.json --allow-local-development-signatures --json",
+      "registry_read": "runx registry read --registry https://api.runx.ai --json hkaaki/crm-cleanup@0.2.0"
+    }
+  },
+  "package": {
+    "name": "crm-cleanup",
+    "owner": "hkaaki",
+    "document_version": "0.2.0",
+    "registry_version": "0.2.0",
+    "registry_ref": "hkaaki/crm-cleanup@0.2.0",
+    "digest": "sha256:11541e15a7d15d9e4b3dc958f930a55a23eef05f49a1d23edb0834e5fc508498",
+    "source_revision": "cbbbb45fdc60d050ad402a0b515a3b930b7dc0ab"
+  },
+  "artifacts": {
+    "public_url": "https://runx.ai/x/hkaaki/crm-cleanup@0.2.0",
+    "source_url": "https://github.com/hkaaki/runx/tree/cbbbb45fdc60d050ad402a0b515a3b930b7dc0ab/skills/crm-cleanup",
+    "pr_url": "https://github.com/runxhq/runx/pull/459",
+    "x_yaml": "https://raw.githubusercontent.com/hkaaki/runx/cbbbb45fdc60d050ad402a0b515a3b930b7dc0ab/skills/crm-cleanup/X.yaml",
+    "skill_md": "https://raw.githubusercontent.com/hkaaki/runx/cbbbb45fdc60d050ad402a0b515a3b930b7dc0ab/skills/crm-cleanup/SKILL.md",
+    "verification_json": "https://hkaaki.github.io/ash-agent-work/frantic-79-crm-cleanup/verification.json",
+    "evidence_json": "https://hkaaki.github.io/ash-agent-work/frantic-79-crm-cleanup/evidence.json",
+    "receipt_ref": "runx:receipt:sha256:c554a805b1ae0d0a689f3338a21f53ee70f2468a0a491034f53b12111258e368",
+    "report": "https://hkaaki.github.io/ash-agent-work/frantic-79-crm-cleanup/report.md"
+  },
+  "hosted_harness": {
+    "status": "passed",
+    "checks_passed": 4,
+    "checks_failed": 0,
+    "case_names": [
+      "crm-cleanup-applies-traced-updates",
+      "crm-cleanup-noop-executes-nothing",
+      "crm-cleanup-rejects-unlisted-field",
+      "crm-cleanup-needs-transcript"
+    ],
+    "evidence_url": "https://runx.ai/x/hkaaki/crm-cleanup@0.2.0#harness"
+  },
+  "dogfood": {
+    "package": "hkaaki/crm-cleanup@0.2.0",
+    "input": {
+      "crm_source": {
+        "kind": "web_fetch",
+        "allowlist": [
+          "raw.githubusercontent.com"
+        ],
+        "url": "https://raw.githubusercontent.com/hkaaki/ash-agent-work/2de5fbbc757fdd07835d5affe674ef1c45bf8afa/frantic-79-crm-cleanup/globex.json"
+      },
+      "transcript": "Call with Globex on renewal. Dana said the rollout stalled and they want an executive review before renewing. Next step agreed: send the Q3 usage report by Friday.",
+      "crm_schema": {
+        "allowed_fields": [
+          "account_status",
+          "next_action",
+          "health_score"
+        ]
+      }
+    },
+    "command": "runx skill hkaaki/crm-cleanup@0.2.0 --registry https://api.runx.ai --inputs input.json --json --receipt-dir receipts",
+    "receipt_ref": "runx:receipt:sha256:c554a805b1ae0d0a689f3338a21f53ee70f2468a0a491034f53b12111258e368",
+    "verify_verdict": {
+      "valid": true,
+      "schema": "runx.verify_verdict.v1",
+      "receipt_id": "sha256:c554a805b1ae0d0a689f3338a21f53ee70f2468a0a491034f53b12111258e368",
+      "signature_mode": "local-development",
+      "command": "runx verify --receipt receipts/sha256-c554a805b1ae0d0a689f3338a21f53ee70f2468a0a491034f53b12111258e368.json --allow-local-development-signatures --json"
+    },
+    "harness_cases": [
+      {
+        "name": "crm-cleanup-applies-traced-updates",
+        "status": "sealed"
+      },
+      {
+        "name": "crm-cleanup-noop-executes-nothing",
+        "status": "sealed"
+      },
+      {
+        "name": "crm-cleanup-rejects-unlisted-field",
+        "status": "sealed"
+      },
+      {
+        "name": "crm-cleanup-needs-transcript",
+        "status": "failure"
+      }
+    ],
+    "output_metrics": {
+      "decision": "applied",
+      "source_read": {
+        "count": 1,
+        "kind": "web_fetch",
+        "ref": "https://raw.githubusercontent.com/hkaaki/ash-agent-work/2de5fbbc757fdd07835d5affe674ef1c45bf8afa/frantic-79-crm-cleanup/globex.json"
+      },
+      "field_updates": [
+        {
+          "evidence_quote": "the rollout stalled and they want an executive review before renewing",
+          "field": "account_status",
+          "from": "healthy",
+          "record_id": "acct-globex",
+          "to": "at_risk"
+        },
+        {
+          "evidence_quote": "send the Q3 usage report by Friday",
+          "field": "next_action",
+          "from": "none",
+          "record_id": "acct-globex",
+          "to": "send the Q3 usage report by Friday"
+        }
+      ],
+      "write_result": {
+        "executed": true,
+        "transport": "mock-crm.v1",
+        "schema": "runx.crm_write_result.v1",
+        "before": [
+          {
+            "account_status": "healthy",
+            "id": "acct-globex",
+            "next_action": "none"
+          }
+        ],
+        "after": [
+          {
+            "account_status": "at_risk",
+            "id": "acct-globex",
+            "next_action": "send the Q3 usage report by Friday"
+          }
+        ],
+        "applied": [
+          {
+            "field": "account_status",
+            "from": "healthy",
+            "record_id": "acct-globex",
+            "to": "at_risk"
+          },
+          {
+            "field": "next_action",
+            "from": "none",
+            "record_id": "acct-globex",
+            "to": "send the Q3 usage report by Friday"
+          }
+        ]
+      },
+      "rejected_updates": [],
+      "takeaways": [
+        "Update acct-globex.account_status from healthy to at_risk.",
+        "Update acct-globex.next_action from none to send the Q3 usage report by Friday."
+      ]
+    }
+  }
+}
