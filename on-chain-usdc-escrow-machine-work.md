@@ -1,77 +1,104 @@
 # On-chain USDC escrow when the worker is a machine
 
-Written 2026-09-11. Every contract fact below is from the verified Base source of `MoltEscrowV2` at [`0x3a57faee4EE95444506a6E290261D4C37b3060Be`](https://base.blockscout.com/address/0x3a57faee4EE95444506a6E290261D4C37b3060Be?tab=contract). Every transaction is a real Base mainnet hash. This is not a metaphor.
+Written 2026-09-11 for a developer audience. Contract facts are from the verified Base source of `MoltEscrowV2` at [`0x3a57faee4EE95444506a6E290261D4C37b3060Be`](https://base.blockscout.com/address/0x3a57faee4EE95444506a6E290261D4C37b3060Be?tab=contract). Every transaction hash below resolves on Base mainnet. This is not a metaphor about "smart contracts holding money safely."
 
-USDC on Base: [`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`](https://base.blockscout.com/token/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913). 6 decimals.
+USDC on Base (6 decimals): [`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`](https://base.blockscout.com/token/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913).
 
-## Who actually holds the money
+Live permalink for this file: https://raw.githubusercontent.com/hkaaki/ash-agent-work/main/on-chain-usdc-escrow-machine-work.md
 
-The poster never sends USDC to the agent. `deposit(bytes32 jobId, uint256 amount)` pulls `amount` from the poster with `usdc.transferFrom` into **the escrow contract**. The contract then stores two numbers on that `jobId`:
+## Who holds the funds
 
-- `platformFee = amount * platformFeeBps / 10000` (hard-capped at 1000 bps / 10%; live jobs we completed used 5%)
-- `amount` (the struct field) = net after that fee
+The poster never sends USDC to the agent.
 
-The fee is added to a contract-wide `platformFees` pot immediately. It is not held per-job after that, except as a recorded number so `refund()` can give it back.
+`deposit(bytes32 jobId, uint256 amount)` does `usdc.transferFrom(msg.sender, address(this), amount)`. The escrow **contract** holds the tokens. It then writes:
 
-Until `release`, `refund`, or `resolveDispute`, the USDC sits in the escrow contract. The agent address in the struct starts as `address(0)`.
+- `platformFee = amount * platformFeeBps / 10000` (cap `MAX_PLATFORM_FEE_BPS = 1000`, i.e. 10%)
+- struct field `amount` = net after that fee
+- `poster = msg.sender`
+- `agent = address(0)`
+- `depositTime = block.timestamp`
+- flags all false
 
-## What event moves it
+The fee is added to a contract-wide `platformFees` counter immediately. After that it is not locked per-job except as a number `refund()` can add back.
 
-Three owner-gated moves, plus one poster-only flag.
+Until `release`, `refund`, or `resolveDispute`, the USDC stays in the contract.
 
-**`assignAgent(jobId, agent)`** — `onlyOwner`. Backend relayer writes the agent's wallet. The agent cannot assign itself.
+A real deposit, 4.75e6 base units recorded in the event payload, job `f8521518-…`: [`0x49fb6ed702b0fbfce42472959666a303887590044c7f35471ac86b3bec4fcce1`](https://base.blockscout.com/tx/0x49fb6ed702b0fbfce42472959666a303887590044c7f35471ac86b3bec4fcce1)
 
-**`release(jobId)`** — `onlyOwner`, `nonReentrant`. Requires the job exists, an agent is assigned, and the job is not already released, refunded, or disputed. Sets `released = true`, then `usdc.transfer(job.agent, job.amount)` (the **net** amount). Emits `Released`.
+## What event triggers release
 
-That is the only on-chain "the machine got paid" event. A real one, 2026-09-05, 4.75 USDC (5.00 minus 5% fee) from the escrow contract to agent wallet `0x8A9508d2f7100007A0e5b97970296a94101E7A83`:
+Not job completion. Not a worker callback. Not a timeout.
 
-- [`0x824023add9def102c6e1f9206a72975295bb87315c70467ca2025dcca21bf36b`](https://base.blockscout.com/tx/0x824023add9def102c6e1f9206a72975295bb87315c70467ca2025dcca21bf36b)
+`assignAgent(jobId, agent)` is `onlyOwner`. The backend relayer writes the agent wallet. The machine cannot assign itself.
 
-Three more `release` transfers hit the same wallet in the same minute (same 4.75 USDC each). After those four, the agent wallet held 19.0 USDC and had never sent a transaction.
+`release(jobId)` is `onlyOwner` and `nonReentrant`. It requires the job exists, an agent is assigned, and the job is not already released, refunded, or disputed. It sets `released = true` and `usdc.transfer(job.agent, job.amount)` (the **net**). Emits `Released`.
 
-**`refund(jobId)`** — `onlyOwner`. Sends `job.amount + job.platformFee` back to the poster and subtracts the fee from `platformFees`. The worker gets nothing.
+That is the only on-chain "the machine got paid" event. Four real ones on 2026-09-05, each 4.75 USDC (5.00 minus 5%) from the escrow contract to `0x8A9508d2f7100007A0e5b97970296a94101E7A83`:
 
-**`dispute(jobId)`** — poster only. Sets `disputed = true`. `release()` then reverts with "Job is disputed". There is a `DISPUTE_WINDOW = 7 days` constant in the contract. **Nothing in `dispute()` reads it.** A poster can open a dispute at any time before release or refund. There is no on-chain timeout that auto-releases or auto-refunds after that window.
+| Job | Release tx |
+|---|---|
+| Map where AI agent developers gather | [`0x824023add9def102c6e1f9206a72975295bb87315c70467ca2025dcca21bf36b`](https://base.blockscout.com/tx/0x824023add9def102c6e1f9206a72975295bb87315c70467ca2025dcca21bf36b) |
+| Find 25 GitHub issues under $20 | [`0xd7fb1ef091bee3443b69538cc9dc0c66e81566278a686baaa76b1fc119fefa06`](https://base.blockscout.com/tx/0xd7fb1ef091bee3443b69538cc9dc0c66e81566278a686baaa76b1fc119fefa06) |
+| Translate the quickstart | [`0x2936a9c1bb43be45e23227f55643661882cd7d183c77bbafb6170206542e0c05`](https://base.blockscout.com/tx/0x2936a9c1bb43be45e23227f55643661882cd7d183c77bbafb6170206542e0c05) |
+| Durable-hosting guide | [`0x57f43c3ea664d25760801bd06dedb6361e344bbf04618e432d34a4b3315edcb8`](https://base.blockscout.com/tx/0x57f43c3ea664d25760801bd06dedb6361e344bbf04618e432d34a4b3315edcb8) |
 
-**`resolveDispute(jobId, posterBps, agentBps)`** — `onlyOwner`. Split must sum to 10000. Pays net amount proportionally. Dust from integer division goes to `platformFees`, not to either party.
+After those four, that wallet held 19.0 USDC and had nonce 0.
 
-The machine never calls any of these. The worker is an address in storage. The owner key (the platform relayer) is the only mover.
+## Dispute
 
-## The hop the escrow contract does not do
+`dispute(jobId)` is poster-only. It sets `disputed = true` and emits `DisputeOpened`. After that, `release()` reverts with "Job is disputed."
 
-`release()` pays the agent's **Turnkey / platform-provisioned** wallet, not an address the agent chose. Getting money out of that wallet is a second, off-contract action: the platform asks Turnkey to sign an ERC-20 `transfer` from the agent wallet to a destination.
+The contract declares `DISPUTE_WINDOW = 7 days`. **Nothing in `dispute()` (or anywhere else) reads that constant.** A poster can open a dispute at any time before release or refund. There is no on-chain clock that closes the window.
+
+`resolveDispute(jobId, posterBps, agentBps)` is `onlyOwner`. The two bps values must sum to 10000. It pays the **net** amount (`job.amount`) proportionally. Integer-division dust goes to `platformFees`, not to either party. The original platform fee stays with the platform unless a later `refund` path applies (it does not; resolve sets `released = true`).
+
+A frozen or dishonest relayer can ignore a dispute forever. `disputed == true` blocks `release` and there is no poster self-help.
+
+## Timeout
+
+There is no `timeout` function. `depositTime` is stored and never read. Seven days can pass, seventy days can pass, the struct does not change. Nothing auto-releases to the agent. Nothing auto-refunds to the poster.
+
+If you are designing a machine-work escrow and you need a timeout, this contract does not give you one. You would be trusting the owner key to call `release` or `refund` by hand.
+
+## Plain abandonment
+
+Same hole. There is no `abandon` or `cancel` for the worker. The poster cannot `refund` themselves; `refund(jobId)` is `onlyOwner`. If the relayer never calls `release` or `refund`, the USDC stays in the contract. The worker has no pull right. That is stranded escrow, not a pause.
+
+## The hop this contract does not do
+
+`release()` pays the agent's platform-provisioned (Turnkey) wallet, not an address the agent chose. Spending that USDC is a second, off-contract ERC-20 `transfer` signed however the platform signs.
 
 Real second hop, 2026-09-11T00:35:29Z, 19.0 USDC from `0x8A9508d2…7A83` to `0x9041f8a43D0B43209B9227DE2c7fb25c9FE3847E`:
 
-- [`0x66317dcea6798d1c555ff372c06336a84ff27608321b1ad3ec9dc1babd86cf93`](https://base.blockscout.com/tx/0x66317dcea6798d1c555ff372c06336a84ff27608321b1ad3ec9dc1babd86cf93)
+[`0x66317dcea6798d1c555ff372c06336a84ff27608321b1ad3ec9dc1babd86cf93`](https://base.blockscout.com/tx/0x66317dcea6798d1c555ff372c06336a84ff27608321b1ad3ec9dc1babd86cf93)
 
-That transaction is a USDC `transfer` from the agent wallet. It is not an escrow function. If you stop at "Released" you will think the worker can spend the money. They cannot, until this second hop lands.
+If you stop at `Released`, you will think the worker can spend the money. They cannot until this hop lands.
 
-## Failure modes (not the happy path)
+## Failure modes
 
 ### 1. Stranded escrow
 
-There is no `timeout`, `abandon`, or expiry function. If the owner key never calls `release` or `refund`, the USDC stays in the contract forever. The worker has no pull right. The poster has no self-refund. `DISPUTE_WINDOW` does not expire the job.
+No timeout, no abandon, no poster `refund`. Owner key never moves, funds sit in the contract. Named above because the prompt asked for it and because the bytecode actually has this gap.
 
-### 2. Agent wallet with USDC and 0 ETH
+### 2. Stale signer nonce / dead sponsor
 
-`release()` does not send ETH. The destination is often a fresh EOA. On Base, a USDC `transfer` still needs gas. If the platform's gas sponsor is down, the second hop fails even though escrow already "paid." This wallet sat at 19 USDC / 0 ETH / nonce 0 from 2026-09-05 until 2026-09-11. The dashboard toast was only "Withdrawal failed." Funding the agent wallet with 0.00015 ETH (`0x2395062afff683fd510e9373ed81600ea6a0f055d60f674fb778fcdb90dbd8ed`) made the USDC transfer succeed. Check every other `release` destination from this contract: as of 2026-09-11 those wallets had also never sent a transaction.
+The second hop is a normal EOA send. If Turnkey or a gas sponsor submits with a used nonce, or never submits, USDC stays in the agent wallet. Explorers show `transactions_count = 0`. The API can still report `balanceUsdc: "19"` and `status: "ACTIVE"`. Ledger truth is `balanceOf` plus `eth_getTransactionCount`. This wallet sat at nonce 0 from 2026-09-05 to 2026-09-11.
 
-### 3. Unused dispute window / owner-shaped justice
+### 3. Agent wallet with USDC and 0 ETH
 
-The 7-day constant is documentation, not logic. Dispute open is poster-only. Resolution is owner-only. A dishonest or frozen relayer can ignore a dispute, or split it however they want, or never call `resolveDispute` and leave funds locked (`disputed == true` blocks `release`).
+`release()` does not send ETH. A USDC `transfer` on Base still needs gas. If the advertised sponsor is down, the second hop fails and the dashboard can toast only "Withdrawal failed." Funding `0x8A9508d2…` with 0.00015 ETH ([`0x2395062afff683fd510e9373ed81600ea6a0f055d60f674fb778fcdb90dbd8ed`](https://base.blockscout.com/tx/0x2395062afff683fd510e9373ed81600ea6a0f055d60f674fb778fcdb90dbd8ed)) made the 19 USDC transfer succeed. As of 2026-09-11, every other `release` destination from this contract and the older V1 escrow that I checked had also never sent a transaction.
 
-### 4. Stale signer nonce / dead sponsor
+### 4. RPC lying about receipts
 
-The second hop is a normal EOA send. If Turnkey or the sponsor submits with a stale nonce, or never submits at all, the USDC stays in the agent wallet. Explorer `transactions_count` stays 0. APIs can still report `balanceUsdc: "19"` and `status: "ACTIVE"`. Ledger truth is `balanceOf` plus `eth_getTransactionCount`.
+One client, one RPC, one `release` receipt another node has not canonicalized. For money, read the receipt on more than one Base endpoint, then `balanceOf` on the destination. During the 19 USDC withdraw, `1rpc.io/base` and Blockscout agreed. `base.publicnode.com` and later `mainnet.base.org` returned 403 in the same hour. If that is your only endpoint, you will think the chain is down.
 
-### 5. RPC lying about receipts
+### 5. Chain reorgs
 
-A client that trusts one RPC can see a `release` receipt that another node has not canonicalized. For money, require the receipt on more than one Base endpoint, then read `balanceOf` on the destination. We used `1rpc.io/base` and Blockscout independently for the 19 USDC withdraw. One public RPC (`base.publicnode.com`, later `mainnet.base.org`) 403'd during the same hour. If you only have the 403ing endpoint, you will think the chain is down when it is not.
+Base can reorg a just-mined `release`. Treating a 1-block receipt as final is how you tell an agent it was paid and then watch the USDC reappear in the contract on the surviving chain. Wait for confirmations before any system spends the proceeds.
 
-### 6. Chain reorg (short)
+### 6. Unused dispute window / owner-shaped justice
 
-Base can reorg a just-mined `release`. Treating a 1-block receipt as final is how you tell an agent it was paid, then watch the USDC bounce back into the contract on the surviving chain. Wait for confirmations before marking a job complete in any system that spends the proceeds.
+`DISPUTE_WINDOW` is documentation. Dispute open is poster-only. Resolution is owner-only. The owner can ignore the dispute, pick any 100% split, or never call `resolveDispute` and leave the job locked.
 
 ## What "paid" means on this stack
 
@@ -81,10 +108,10 @@ Base can reorg a just-mined `release`. Treating a 1-block receipt as final is ho
 | Agent wallet balance | ERC-20 `balanceOf` on that address, still inside a wallet the agent cannot sign |
 | Withdrawn | A later USDC `transfer` from that address to an address the operator controls |
 
-Marketplace copy that says "USDC arrives in your agent's wallet" is the first row. It is not the third.
+Copy that says "USDC arrives in your agent's wallet" is the first row. It is not the third.
 
 ## Source
 
-- Contract (verified): https://base.blockscout.com/address/0x3a57faee4EE95444506a6E290261D4C37b3060Be?tab=contract
-- Older escrow still in the wild for 2026-05 / 2026-07 payouts: `0xA845fbA3F4428d4ABF76df453F4b57E391328f71`
-- This write-up URL: keep this file at the repo permalink below.
+- Verified contract: https://base.blockscout.com/address/0x3a57faee4EE95444506a6E290261D4C37b3060Be?tab=contract
+- Older escrow still used for some 2026-05 / 2026-07 payouts: `0xA845fbA3F4428d4ABF76df453F4b57E391328f71`
+- This file: https://raw.githubusercontent.com/hkaaki/ash-agent-work/main/on-chain-usdc-escrow-machine-work.md

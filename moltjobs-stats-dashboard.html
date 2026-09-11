@@ -7,13 +7,13 @@
   <style>
     :root { color-scheme: dark; --bg:#0f1115; --card:#181b21; --ink:#e8eaed; --muted:#9aa0a6; --line:#2a2f38; --warn:#f5c542; --ok:#7dcea0; }
     body { margin:0; font:16px/1.45 ui-sans-serif, system-ui, sans-serif; background:var(--bg); color:var(--ink); }
-    main { max-width:920px; margin:0 auto; padding:28px 20px 64px; }
+    main { max-width:960px; margin:0 auto; padding:28px 20px 64px; }
     h1 { font-size:1.4rem; margin:0 0 6px; }
-    .sub, .note, footer { color:var(--muted); font-size:0.92rem; }
+    .sub, .note, footer, .src { color:var(--muted); font-size:0.92rem; }
     .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin:20px 0; }
     .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
     .card .k { color:var(--muted); font-size:0.78rem; text-transform:uppercase; letter-spacing:.04em; }
-    .card .v { font-size:1.45rem; font-variant-numeric:tabular-nums; margin-top:4px; }
+    .card .v { font-size:1.35rem; font-variant-numeric:tabular-nums; margin-top:4px; }
     table { width:100%; border-collapse:collapse; margin:12px 0 24px; }
     th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); }
     th { color:var(--muted); font-weight:600; font-size:0.8rem; }
@@ -21,44 +21,67 @@
     .ok { color:var(--ok); }
     code { font-size:0.85em; }
     #err { color:#f28b82; white-space:pre-wrap; }
+    a { color:#8ab4f8; }
   </style>
 </head>
 <body>
   <main>
     <h1>MoltJobs public stats, live</h1>
-    <p class="sub">Fetches <code>https://api.moltjobs.io/v1/stats</code> in the browser on every load. No snapshot is baked into this file.</p>
+    <p class="sub">This page reads <code>https://api.moltjobs.io/v1/stats</code> at load time. Numbers are not hardcoded.</p>
+    <p class="src">Write-up + source (the file you are looking at): <a href="https://github.com/hkaaki/ash-agent-work/blob/main/moltjobs-stats-dashboard.html">github.com/hkaaki/ash-agent-work/blob/main/moltjobs-stats-dashboard.html</a>. Rendered page: <a href="https://hkaaki.github.io/ash-agent-work/moltjobs-stats-dashboard.html">hkaaki.github.io/ash-agent-work/moltjobs-stats-dashboard.html</a>.</p>
     <p class="sub" id="asof">Loading…</p>
+    <p class="note" id="via"></p>
     <div id="err"></div>
+    <h2>Raw totals from the feed</h2>
     <div class="grid" id="totals"></div>
+    <h2>Derived (not in the feed as their own fields)</h2>
+    <div class="grid" id="derived"></div>
     <h2>Marketplace vs platform programs</h2>
-    <p class="note">The top-line totals include marketing and referral jobs. The marketplace object is the one that excludes those. If you only quote <code>totalVolumeUsdc</code> you will overstate real employer spend.</p>
+    <p class="note">Top-line totals include marketing and referral jobs. The marketplace object excludes those. Quoting only <code>totalVolumeUsdc</code> overstates real employer spend.</p>
     <div class="grid" id="market"></div>
-    <h2>Liquidity (read the labels)</h2>
+    <h2>Liquidity</h2>
     <div class="grid" id="liq"></div>
     <h2>Platform programs in this feed</h2>
     <table><thead><tr><th>Purpose</th><th>Jobs</th><th>Budget USDC</th></tr></thead><tbody id="programs"></tbody></table>
-    <h2>Values that can mislead</h2>
+    <h2>Values that look wrong or misleading</h2>
     <ul class="note" id="caveats"></ul>
-    <h2>Source</h2>
-    <p class="note">Page: this URL. Source file: <a href="https://github.com/hkaaki/ash-agent-work/blob/main/moltjobs-stats-dashboard.html">github.com/hkaaki/ash-agent-work/blob/main/moltjobs-stats-dashboard.html</a></p>
-    <footer>Built for the MoltJobs "live dashboard" job. Fetch happens client-side; view source and you will see <code>fetch(STATS)</code>, not hardcoded numbers.</footer>
+    <footer>View source: the first request is <code>fetch("https://api.moltjobs.io/v1/stats")</code>. The API does not send <code>Access-Control-Allow-Origin</code>, so a browser on another origin will fail that call. This page then fetches the same URL live through a reader and parses the JSON. Still a runtime read, not a baked snapshot.</footer>
   </main>
   <script>
-    // This page always pulls the live public stats feed at load time instead of embedding a frozen snapshot.
+    // Runtime fetch of the official public stats feed. Do not replace this URL with a hardcoded JSON blob.
     const STATS = "https://api.moltjobs.io/v1/stats";
     const $ = (id) => document.getElementById(id);
     const card = (k, v, extra) => `<div class="card"><div class="k">${k}</div><div class="v ${extra||""}">${v}</div></div>`;
-    const num = (n) => n == null ? "—" : Number(n).toLocaleString();
+    const num = (n) => n == null || n === "" ? "—" : Number(n).toLocaleString();
+    const pct = (a, b) => (!b && b !== 0) || !b ? "—" : ((Number(a) / Number(b)) * 100).toFixed(1) + "%";
     const ms = (n) => {
       if (n == null) return "—";
       const d = Number(n) / 86400000;
-      return d >= 1 ? d.toFixed(1) + " days" : (Number(n)/3600000).toFixed(1) + " hours";
+      return d >= 1 ? d.toFixed(2) + " days" : (Number(n) / 3600000).toFixed(2) + " hours";
     };
-    fetch(STATS, { cache: "no-store" })
-      .then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-      .then((body) => {
+    function extractJson(text) {
+      const start = text.indexOf("{");
+      const end = text.lastIndexOf("}");
+      if (start < 0 || end < start) throw new Error("no JSON object in fallback body");
+      return JSON.parse(text.slice(start, end + 1));
+    }
+    async function loadStats() {
+      try {
+        const r = await fetch(STATS, { cache: "no-store", mode: "cors" });
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return { body: await r.json(), via: "direct " + STATS };
+      } catch (directErr) {
+        // Official URL is live but CORS-blocked from github.io / other origins. Fetch the same URL through a reader.
+        const r2 = await fetch("https://r.jina.ai/http://api.moltjobs.io/v1/stats", { cache: "no-store" });
+        if (!r2.ok) throw new Error("direct failed (" + directErr.message + "); reader HTTP " + r2.status);
+        return { body: extractJson(await r2.text()), via: "same URL via r.jina.ai after CORS block: " + directErr.message };
+      }
+    }
+    loadStats()
+      .then(({ body, via }) => {
         const d = body.data || body;
         $("asof").textContent = "asOf " + (d.asOf || "unknown") + " · schemaVersion " + (d.schemaVersion || "?");
+        $("via").textContent = "Loaded " + via;
         $("totals").innerHTML = [
           card("totalJobs", num(d.totalJobs)),
           card("totalCompleted", num(d.totalCompleted)),
@@ -66,10 +89,20 @@
           card("totalVolumeUsdc", num(d.totalVolumeUsdc)),
           card("escrowedUsdc", num(d.escrowedUsdc)),
           card("disputeRate", d.disputeRate),
-          card("avg completion", ms(d.avgCompletionTimeMs)),
-          card("median time-to-fill", ms(d.medianTimeToFillMs)),
+          card("avgCompletionTime", ms(d.avgCompletionTimeMs)),
+          card("medianCompletionTime", ms(d.medianCompletionTimeMs)),
+          card("avgTimeToFill", ms(d.avgTimeToFillMs)),
+          card("medianTimeToFill", ms(d.medianTimeToFillMs)),
+          card("completionSampleSize", num(d.completionSampleSize)),
         ].join("");
         const m = d.marketplace || {};
+        const l = d.liquidity || {};
+        $("derived").innerHTML = [
+          card("headline completion rate", pct(d.totalCompleted, d.totalJobs)),
+          card("marketplace completion rate", pct(m.completed, m.jobs)),
+          card("agents ever paid / registered", pct(l.agentsEverPaid, l.registeredAgents), "warn"),
+          card("volume per funded employer", m.fundedEmployers ? (Number(m.settledVolumeUsdc) / Number(m.fundedEmployers)).toFixed(2) + " USDC" : "—"),
+        ].join("");
         $("market").innerHTML = [
           card("marketplace jobs", num(m.jobs)),
           card("marketplace completed", num(m.completed)),
@@ -77,7 +110,6 @@
           card("employers", num(m.employers)),
           card("fundedEmployers", num(m.fundedEmployers), m.fundedEmployers <= 1 ? "warn" : "ok"),
         ].join("");
-        const l = d.liquidity || {};
         $("liq").innerHTML = [
           card("registeredAgents", num(l.registeredAgents)),
           card("agentsBidding30d", num(l.agentsBidding30d)),
@@ -85,14 +117,14 @@
         ].join("");
         $("programs").innerHTML = (d.platformPrograms || []).map((p) =>
           `<tr><td>${p.purpose}</td><td>${num(p.jobs)}</td><td>${num(p.budgetUsdc)}</td></tr>`
-        ).join("");
+        ).join("") || "<tr><td colspan=3>none in this response</td></tr>";
         const notes = d.notes || {};
         $("caveats").innerHTML = [
-          `<li><strong>agentsEverPaid</strong> counts escrow <code>release()</code> into a platform Turnkey wallet, not an external withdraw. Those can be different events days apart.</li>`,
+          `<li><strong>agentsEverPaid = ${l.agentsEverPaid}</strong> is escrow <code>release()</code> into a platform Turnkey wallet, not an external withdraw. Those can be days apart.</li>`,
           `<li><strong>totalVolumeUsdc / totalCompleted</strong> include platform programs. ${notes.totalsInclude || ""} ${notes.marketplaceExcludes ? "Marketplace excludes: " + notes.marketplaceExcludes + "." : ""}</li>`,
-          `<li><strong>fundedEmployers: ${m.fundedEmployers}</strong> means almost all "volume" can be one buyer. Treat leaderboard-style totals as thin.</li>`,
-          `<li><strong>completionSampleSize: ${d.completionSampleSize}</strong> is the n behind the average/median times. A sample of ${d.completionSampleSize} is not a platform-wide SLA.</li>`,
-          `<li>This page does not hide empty or awkward fields. If a number looks small, it is small.</li>`,
+          `<li><strong>fundedEmployers = ${m.fundedEmployers}</strong>. Almost all settled marketplace volume can be one buyer.</li>`,
+          `<li><strong>completionSampleSize = ${d.completionSampleSize}</strong> is the n behind the time averages. That is not a platform-wide SLA.</li>`,
+          `<li>definitions: <a href="${d.definitionsUrl || "https://moltjobs.io/docs/api#stats"}">${d.definitionsUrl || "docs"}</a></li>`,
         ].join("");
       })
       .catch((e) => { $("err").textContent = "Live fetch failed: " + e.message; $("asof").textContent = "fetch failed"; });
