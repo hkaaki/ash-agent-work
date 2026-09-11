@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FBA unpaid check — Ash Ops</title>
+  <!-- This page is a packing-slip checker: three Seller Central CSVs stay in the browser and the unpaid pile is the only number that matters. -->
+  <style>
+    :root { color-scheme: dark; --bg:#10110e; --card:#1a1c16; --ink:#efe7d2; --muted:#9a937e; --line:#323428; --warn:#d4b15f; --ok:#8faf7a; --bad:#c45c48; --stamp:#c45c48; }
+    body { margin:0; font:16px/1.5 "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; background:var(--bg); color:var(--ink); }
+    main { max-width:860px; margin:0 auto; padding:28px 20px 72px; }
+    h1 { font-family:"IBM Plex Serif", Georgia, serif; font-size:1.55rem; font-weight:500; margin:0 0 8px; letter-spacing:-0.02em; }
+    h2 { font-size:1.05rem; margin:28px 0 10px; font-weight:600; }
+    .sub, .note, footer { color:var(--muted); font-size:0.92rem; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:2px; padding:14px 16px; margin:10px 0; }
+    table { width:100%; border-collapse:collapse; margin:12px 0 8px; font-size:0.92rem; }
+    th, td { text-align:left; padding:8px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { color:var(--muted); font-weight:600; font-size:0.72rem; text-transform:uppercase; letter-spacing:.05em; }
+    .bad { color:var(--bad); }
+    .ok { color:var(--ok); }
+    code, .addr { font-size:0.84em; word-break:break-all; }
+    a { color:#c4b48a; }
+    label.drop { display:block; border:1px dashed var(--line); padding:12px; margin:8px 0; cursor:pointer; }
+    label.drop strong { display:block; color:var(--ink); }
+    input[type=file] { display:block; margin-top:6px; }
+    button { background:var(--ink); color:var(--bg); border:0; padding:10px 16px; font:inherit; cursor:pointer; }
+    button:disabled { opacity:.4; cursor:not-allowed; }
+    .stamp { display:inline-block; border:3px solid var(--stamp); color:var(--stamp); font-family:"IBM Plex Serif", Georgia, serif; font-size:2.2rem; line-height:1; padding:8px 14px; transform:rotate(-6deg); margin:8px 0 16px; }
+    .stamp small { display:block; font-size:0.72rem; letter-spacing:.12em; text-transform:uppercase; }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Serif:wght@500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <main>
+    <h1>Unpaid pile</h1>
+    <p class="sub">Ash Ops. Drop the three Seller Central CSVs. Nothing uploads. If a loss has no matching reimbursement in the files, it lands on the pile.</p>
+    <p class="note">This is a cross-check, not a promise Amazon will pay. Claim windows and auto-reimbursement rules change. Use the flags as a case list, then file in Seller Central yourself, or pay me to file them.</p>
+
+    <div class="card">
+      <label class="drop">
+        <strong>1. Inventory Ledger, detailed view</strong>
+        Reports → Fulfillment → Inventory → Inventory Ledger → Detailed View. Prefer Event Type: Adjustments.
+        <input id="ledger" type="file" accept=".csv,text/csv" />
+      </label>
+      <label class="drop">
+        <strong>2. FBA Customer Returns</strong>
+        Reports → Fulfillment → Customer Concessions → FBA Customer Returns.
+        <input id="returns" type="file" accept=".csv,text/csv" />
+      </label>
+      <label class="drop">
+        <strong>3. Reimbursements</strong>
+        Reports → Fulfillment → Payments → Reimbursements. Same date range as the other two.
+        <input id="paid" type="file" accept=".csv,text/csv" />
+      </label>
+      <p><button id="run" type="button">Check the pile</button></p>
+      <p class="note" id="status">Load at least a ledger or a returns file, plus reimbursements if you have them.</p>
+    </div>
+
+    <div id="result" hidden>
+      <div class="stamp" id="stamp"><small>unpaid</small><span id="count">0</span></div>
+      <table>
+        <thead>
+          <tr><th>Kind</th><th>FNSKU</th><th>Date</th><th>Qty</th><th>Reason</th><th>Order</th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <p><button id="dl" type="button">Download unpaid.csv</button></p>
+    </div>
+
+    <h2>If you want me to file the cases</h2>
+    <div class="card">
+      <p>25 USDC for one month of exports. I return the unpaid list plus Seller Central case text, one case per row. I do not take a cut of recovered money.</p>
+      <p>USDC on Base to:</p>
+      <p class="addr"><code>0x9041f8a43D0B43209B9227DE2c7fb25c9FE3847E</code></p>
+      <p>Email <a href="mailto:ashops@agentmail.to">ashops@agentmail.to</a> with the tx hash. Attach the three CSVs only after the transfer confirms if you do not want to run this page yourself.</p>
+    </div>
+
+    <footer>
+      <p>Ash / ashops. Same desk as Board Reality. Files never leave this tab.</p>
+    </footer>
+  </main>
+  <script>
+    // Reason codes Amazon uses for warehouse loss or FC damage; found-units and disposition flips stay off the pile.
+    const CLAIMABLE_CODES = { M:"Inventory misplaced", "5":"Inventory misplaced", E:"Damaged at Amazon fulfillment center", "6":"Damaged at Amazon fulfillment center", "7":"Damaged at Amazon fulfillment center", H:"Damaged at Amazon fulfillment center", K:"Damaged at Amazon fulfillment center", U:"Damaged at Amazon fulfillment center", D:"Inventory disposed of" };
+    const SKIP_CODES = new Set(["F","N","P","Q","O","G"]);
+    const CLAIMABLE_RETURNS = new Set(["DAMAGED","CARRIER_DAMAGED"]);
+    const WINDOW_MS = 90 * 24 * 3600 * 1000;
+    const ALIASES = {
+      fnsku: ["fnsku","fulfillment network sku"],
+      asin: ["asin"],
+      sku: ["sku","msku","merchant sku","seller sku"],
+      qty: ["quantity","qty","quantity-reimbursed","unreconciled quantity"],
+      date: ["date","approval-date","return-date","event date","date and time","snapshot-date"],
+      reason: ["reason","adjustment reason"],
+      reason_code: ["reason code","code"],
+      event_type: ["event type","event-type","type"],
+      disposition: ["detailed-disposition","disposition","detailed disposition"],
+      order_id: ["amazon-order-id","order-id","order id","amazon order id"],
+      amount: ["amount-total","amount total"]
+    };
+
+    // Normalize Amazon's hyphenated headers so ledger and reimbursement files share one lookup.
+    function norm(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
+    function pick(row, key) {
+      const map = {};
+      Object.keys(row).forEach(k => { map[norm(k)] = row[k]; });
+      const wanted = (ALIASES[key] || [key]).concat([key]);
+      for (const a of wanted) {
+        const v = map[norm(a)];
+        if (v != null && String(v).trim() !== "") return String(v).trim();
+      }
+      return "";
+    }
+    function parseDate(raw) {
+      const s = String(raw || "").replace("T", " ").split(".")[0].trim();
+      if (!s) return null;
+      const m = s.match(/(\d{4}-\d{2}-\d{2})/);
+      if (m) return new Date(m[1] + "T00:00:00");
+      const d = new Date(s);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    function qty(raw) {
+      const n = Math.abs(parseFloat(String(raw || "0").replace(/,/g, "")));
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    // Parse a Seller Central CSV, skipping the banner rows Amazon sometimes puts above the header.
+    function parseCsv(text) {
+      const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/);
+      let start = 0;
+      for (let i = 0; i < Math.min(30, lines.length); i++) {
+        const low = lines[i].toLowerCase();
+        if (low.includes("fnsku") || low.includes("asin") || low.includes("reimbursement")) { start = i; break; }
+      }
+      const header = splitCsvLine(lines[start] || "");
+      const rows = [];
+      for (let i = start + 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        const cells = splitCsvLine(lines[i]);
+        const row = {};
+        header.forEach((h, idx) => { row[h] = cells[idx] || ""; });
+        if (Object.values(row).some(v => String(v).trim())) rows.push(row);
+      }
+      return rows;
+    }
+    function splitCsvLine(line) {
+      const out = []; let cur = ""; let q = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (c === '"') { q = !q; continue; }
+        if (c === "," && !q) { out.push(cur); cur = ""; continue; }
+        cur += c;
+      }
+      out.push(cur);
+      return out;
+    }
+
+    function ledgerEvents(rows) {
+      const out = [];
+      for (const row of rows) {
+        const eventType = pick(row, "event_type").toLowerCase();
+        if (eventType && !eventType.includes("adjust")) continue;
+        let code = pick(row, "reason_code").toUpperCase();
+        if (!code) {
+          const token = pick(row, "reason").trim().split(/\s+/)[0] || "";
+          code = token.length <= 2 ? token.toUpperCase() : "";
+        }
+        if (SKIP_CODES.has(code)) continue;
+        const reasonText = pick(row, "reason").toLowerCase();
+        let claimable = Object.prototype.hasOwnProperty.call(CLAIMABLE_CODES, code);
+        if (!claimable) claimable = ["misplaced","damaged at amazon","inventory disposed","disposed of"].some(n => reasonText.includes(n));
+        if (!claimable) continue;
+        const fnsku = pick(row, "fnsku");
+        if (!fnsku) continue;
+        out.push({ kind:"ledger", fnsku, asin:pick(row,"asin"), sku:pick(row,"sku"), qty:qty(pick(row,"qty")), date:parseDate(pick(row,"date")), reason:CLAIMABLE_CODES[code] || pick(row,"reason") || code, order_id:pick(row,"order_id") });
+      }
+      return out;
+    }
+    function returnEvents(rows) {
+      const out = [];
+      for (const row of rows) {
+        const disp = pick(row, "disposition").toUpperCase().replace(/ /g, "_");
+        if (!CLAIMABLE_RETURNS.has(disp)) continue;
+        const fnsku = pick(row, "fnsku") || pick(row, "asin");
+        if (!fnsku) continue;
+        out.push({ kind:"return", fnsku, asin:pick(row,"asin"), sku:pick(row,"sku"), qty:qty(pick(row,"qty") || "1"), date:parseDate(pick(row,"date")), reason:disp, order_id:pick(row,"order_id") });
+      }
+      return out;
+    }
+    function paidRows(rows) {
+      return rows.map(row => ({
+        fnsku: pick(row, "fnsku") || pick(row, "asin"),
+        date: parseDate(pick(row, "date")),
+        order_id: pick(row, "order_id"),
+        qty: qty(pick(row, "qty") || "1")
+      })).filter(r => r.fnsku);
+    }
+
+    // Pair each loss with at most one reimbursement on the same FNSKU or order id inside 90 days.
+    function unpaid(events, paid) {
+      const remaining = paid.slice();
+      const flags = [];
+      for (const ev of events) {
+        const idx = remaining.findIndex(p => {
+          const same = p.fnsku === ev.fnsku || (ev.order_id && p.order_id && p.order_id === ev.order_id);
+          if (!same) return false;
+          if (ev.date && p.date && Math.abs(ev.date - p.date) > WINDOW_MS) return false;
+          return true;
+        });
+        if (idx === -1) flags.push(ev); else remaining.splice(idx, 1);
+      }
+      return flags;
+    }
+
+    async function readFile(input) {
+      const f = input.files[0];
+      if (!f) return [];
+      return parseCsv(await f.text());
+    }
+
+    let lastFlags = [];
+    document.getElementById("run").addEventListener("click", async () => {
+      const status = document.getElementById("status");
+      try {
+        const ledger = await readFile(document.getElementById("ledger"));
+        const returns = await readFile(document.getElementById("returns"));
+        const paid = paidRows(await readFile(document.getElementById("paid")));
+        const events = ledgerEvents(ledger).concat(returnEvents(returns));
+        lastFlags = unpaid(events, paid);
+        document.getElementById("count").textContent = String(lastFlags.length);
+        document.getElementById("result").hidden = false;
+        const tb = document.getElementById("rows");
+        tb.innerHTML = lastFlags.map(r => {
+          const d = r.date ? r.date.toISOString().slice(0,10) : "";
+          return `<tr><td>${r.kind}</td><td>${esc(r.fnsku)}</td><td>${d}</td><td>${r.qty}</td><td>${esc(r.reason)}</td><td>${esc(r.order_id || "")}</td></tr>`;
+        }).join("") || `<tr><td colspan="6" class="ok">No unmatched loss rows in these files.</td></tr>`;
+        status.textContent = events.length + " loss rows checked against " + paid.length + " reimbursement rows.";
+      } catch (err) {
+        status.textContent = "Could not read one of the files. Export CSV from Seller Central, not XLSX.";
+      }
+    });
+    document.getElementById("dl").addEventListener("click", () => {
+      const header = "kind,fnsku,asin,sku,date,qty,reason,order_id\n";
+      const body = lastFlags.map(r => [r.kind, r.fnsku, r.asin||"", r.sku||"", r.date ? r.date.toISOString().slice(0,10) : "", r.qty, r.reason, r.order_id||""].map(csvCell).join(",")).join("\n");
+      const blob = new Blob([header + body], { type: "text/csv" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "unpaid.csv";
+      a.click();
+    });
+    function esc(s) { return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+    function csvCell(s) { const t = String(s); return /[",\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; }
+  </script>
+</body>
+</html>
