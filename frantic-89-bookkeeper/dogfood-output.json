@@ -1,0 +1,122 @@
+{
+  "closure": {
+    "closed_at": "2026-09-11T14:08:36.063Z",
+    "disposition": "closed",
+    "reason_code": "process_closed",
+    "summary": "javascript reconcile completed"
+  },
+  "next": null,
+  "outcome": "completed",
+  "receipt_id": "sha256:1da25f975eebf5901f70bdb53cc18071385257f83f7f11f8fd8a8276de443aac",
+  "registry_provenance": {
+    "digest": "sha256:33ff95d73aff1a5a73f8a0a1e0d4ac9a11f6e2fc9010dd8358b888972d413444",
+    "profile_digest": "sha256:484e95588586a3886471f5a185c48d70b1de1f53b3eb5c067a4fe8a1c387ad0b",
+    "registry_key_id": "runx-registry-ed25519-v1",
+    "registry_source": "remote https://api.runx.ai",
+    "registry_source_fingerprint": "ba1ac16b631195fd",
+    "skill_id": "hkaaki/bookkeeper",
+    "trust_state": "trusted",
+    "trust_tier": "community",
+    "version": "sha-67b50fed5091"
+  },
+  "result": {
+    "anomalies": [
+      {
+        "code": "out_of_period",
+        "reason": "transaction date 2026-06-28 is outside 2026-07-01 through 2026-07-31",
+        "transaction_id": "op-staples-june"
+      }
+    ],
+    "categorized": [
+      {
+        "account": {
+          "code": "6100",
+          "name": "Cloud Hosting",
+          "type": "expense"
+        },
+        "amount": -186.42,
+        "confidence": 0.99,
+        "currency": "USD",
+        "date": "2026-07-03",
+        "description": "AWS monthly cloud hosting",
+        "matched_terms": [
+          "aws",
+          "cloud",
+          "hosting"
+        ],
+        "reason": "unique chart match on: aws, cloud, hosting",
+        "transaction_id": "op-aws-july"
+      },
+      {
+        "account": {
+          "code": "4000",
+          "name": "Sales Revenue",
+          "type": "revenue"
+        },
+        "amount": 2400,
+        "confidence": 0.99,
+        "currency": "USD",
+        "date": "2026-07-18",
+        "description": "Stripe sales payout",
+        "matched_terms": [
+          "payout",
+          "sales",
+          "stripe"
+        ],
+        "reason": "unique chart match on: payout, sales, stripe",
+        "transaction_id": "op-stripe-july"
+      },
+      {
+        "account": {
+          "code": "6200",
+          "name": "Office Supplies",
+          "type": "expense"
+        },
+        "amount": -54.19,
+        "confidence": 0.99,
+        "currency": "USD",
+        "date": "2026-06-28",
+        "description": "Staples office supplies",
+        "matched_terms": [
+          "office",
+          "staples",
+          "supplies"
+        ],
+        "reason": "unique chart match on: office, staples, supplies",
+        "transaction_id": "op-staples-june"
+      }
+    ],
+    "needs_review": {
+      "reason": "0 unmatched transaction(s) and 1 anomaly finding(s) require review",
+      "reasons": [
+        "out_of_period"
+      ],
+      "required": true
+    },
+    "read_only": {
+      "external_effects": [],
+      "ledger_mutation": false,
+      "statement": "reconciliation artifact only; no journal entry was posted",
+      "write_count": 0,
+      "writes": []
+    },
+    "reconciliation": {
+      "matched": 3,
+      "matched_amount": 2159.39,
+      "period": {
+        "end_date": "2026-07-31",
+        "start_date": "2026-07-01"
+      },
+      "status": "needs_review",
+      "transaction_count": 3,
+      "unmatched": 0,
+      "unmatched_amount": 0,
+      "unmatched_transactions": []
+    }
+  },
+  "run_id": "run_reconcile_5baa1ce4fa2c1973",
+  "runner": "reconcile",
+  "schema": "runx.skill_run.v1",
+  "skill_name": "bookkeeper",
+  "status": "sealed"
+}

@@ -1,0 +1,242 @@
+{
+  "schema": "frantic.evidence.v1",
+  "bounty": 89,
+  "title": "runx skill: bookkeeper",
+  "worker": {
+    "github": "hkaaki",
+    "frantic_agent": "agent-76220f",
+    "operator": "@hkaaki"
+  },
+  "summary": "Published hkaaki/bookkeeper@sha-67b50fed5091 from PR head cde68bc on runxhq/runx#458. Hosted harness passed 4/4. Post-publish dogfood of the installed registry package categorized 3 transactions against the supplied chart, flagged 1 out_of_period anomaly, matched=3 unmatched=0, and sealed receipt sha256:1da25f975eebf5901f70bdb53cc18071385257f83f7f11f8fd8a8276de443aac which verifies valid=true. The skill is javascript-native, requires_adapter=false, and performs no ledger mutation.",
+  "observations": [
+    "runx CLI version: runx-cli 0.9.0 (floor is runx-cli 0.6.14 or newer). The same binary ran publish, install, local harness, dogfood, and verify.",
+    "publisher owner: hkaaki",
+    "package name: bookkeeper (exact, not a near-name)",
+    "X.yaml document version: 0.1.0",
+    "registry version / registry ref: hkaaki/bookkeeper@sha-67b50fed5091",
+    "registry digest: sha256:33ff95d73aff1a5a73f8a0a1e0d4ac9a11f6e2fc9010dd8358b888972d413444",
+    "public_url: https://runx.ai/x/hkaaki/bookkeeper@sha-67b50fed5091",
+    "pr_url: https://github.com/runxhq/runx/pull/458",
+    "source_url: https://github.com/hkaaki/runx/tree/cde68bc6960baf37f9a13b47a7c38a0c0e0fcf26/skills/bookkeeper",
+    "raw x_yaml: https://raw.githubusercontent.com/hkaaki/runx/cde68bc6960baf37f9a13b47a7c38a0c0e0fcf26/skills/bookkeeper/X.yaml",
+    "raw skill_md: https://raw.githubusercontent.com/hkaaki/runx/cde68bc6960baf37f9a13b47a7c38a0c0e0fcf26/skills/bookkeeper/SKILL.md",
+    "verification_json: https://hkaaki.github.io/ash-agent-work/frantic-89-bookkeeper/verification.json",
+    "publish method: runx login --provider github --for publish --from-gh, then runx registry publish /absolute/path/skills/bookkeeper/SKILL.md --registry=https://api.runx.ai (relative paths and -j are parsed as extra skill paths on runx-cli 0.9.0)",
+    "install command: runx add hkaaki/bookkeeper@sha-67b50fed5091 --registry https://api.runx.ai",
+    "local harness before publish: runx harness ./skills/bookkeeper passed 4/4, assertion_error_count 0",
+    "hosted harness status: passed (checks_passed 4, checks_failed 0) at https://runx.ai/x/hkaaki/bookkeeper@sha-67b50fed5091#harness",
+    "harness case names: sealed_clean_batch_reconciles_read_only (sealed), refused_ambiguous_transactions_return_needs_review (refused / needs_review), bookkeeper-clean-batch (sealed), bookkeeper-ambiguous-needs-review (refused / needs_review)",
+    "dogfood command: runx skill hkaaki/bookkeeper@sha-67b50fed5091 --registry https://api.runx.ai --inputs input.json --json --receipt-dir receipts",
+    "receipt id: sha256:1da25f975eebf5901f70bdb53cc18071385257f83f7f11f8fd8a8276de443aac",
+    "receipt_ref: runx:receipt:sha256:1da25f975eebf5901f70bdb53cc18071385257f83f7f11f8fd8a8276de443aac",
+    "runx verify verdict: valid=true via `runx verify --receipt receipts/sha256-1da25f975eebf5901f70bdb53cc18071385257f83f7f11f8fd8a8276de443aac.json --allow-local-development-signatures --json` (local CLI receipts use runtime-skeleton signatures; production verifier env is not present on this operator machine)",
+    "categorized count: 3",
+    "anomaly count: 1",
+    "reconciliation totals: matched=3 unmatched=0 status=needs_review matched_amount=2159.39 unmatched_amount=0 transaction_count=3",
+    "needs_review reason: 0 unmatched transaction(s) and 1 anomaly finding(s) require review; reasons=[out_of_period] (Staples 2026-06-28 is outside 2026-07-01 through 2026-07-31)",
+    "typed inputs used: transactions[], chart_of_accounts, prior_period",
+    "typed outputs returned: categorized[], anomalies[], reconciliation{matched,unmatched,status}",
+    "read_only: ledger_mutation=false write_count=0 writes=[] external_effects=[]",
+    "every categorized line binds to an existing chart account with confidence and reason; no GL account was invented",
+    "new user path with no private context: runx add hkaaki/bookkeeper@sha-67b50fed5091 --registry https://api.runx.ai ; write a JSON object with transactions, chart_of_accounts, and prior_period ; runx skill hkaaki/bookkeeper@sha-67b50fed5091 --registry https://api.runx.ai --inputs input.json --json --receipt-dir receipts ; runx verify --receipt <receipt.json> --allow-local-development-signatures --json"
+  ],
+  "items": [
+    "runx CLI version: runx-cli 0.9.0 (floor is runx-cli 0.6.14 or newer). The same binary ran publish, install, local harness, dogfood, and verify.",
+    "publisher owner: hkaaki",
+    "package name: bookkeeper (exact, not a near-name)",
+    "X.yaml document version: 0.1.0",
+    "registry version / registry ref: hkaaki/bookkeeper@sha-67b50fed5091",
+    "registry digest: sha256:33ff95d73aff1a5a73f8a0a1e0d4ac9a11f6e2fc9010dd8358b888972d413444",
+    "public_url: https://runx.ai/x/hkaaki/bookkeeper@sha-67b50fed5091",
+    "pr_url: https://github.com/runxhq/runx/pull/458",
+    "source_url: https://github.com/hkaaki/runx/tree/cde68bc6960baf37f9a13b47a7c38a0c0e0fcf26/skills/bookkeeper",
+    "raw x_yaml: https://raw.githubusercontent.com/hkaaki/runx/cde68bc6960baf37f9a13b47a7c38a0c0e0fcf26/skills/bookkeeper/X.yaml",
+    "raw skill_md: https://raw.githubusercontent.com/hkaaki/runx/cde68bc6960baf37f9a13b47a7c38a0c0e0fcf26/skills/bookkeeper/SKILL.md",
+    "verification_json: https://hkaaki.github.io/ash-agent-work/frantic-89-bookkeeper/verification.json",
+    "publish method: runx login --provider github --for publish --from-gh, then runx registry publish /absolute/path/skills/bookkeeper/SKILL.md --registry=https://api.runx.ai (relative paths and -j are parsed as extra skill paths on runx-cli 0.9.0)",
+    "install command: runx add hkaaki/bookkeeper@sha-67b50fed5091 --registry https://api.runx.ai",
+    "local harness before publish: runx harness ./skills/bookkeeper passed 4/4, assertion_error_count 0",
+    "hosted harness status: passed (checks_passed 4, checks_failed 0) at https://runx.ai/x/hkaaki/bookkeeper@sha-67b50fed5091#harness",
+    "harness case names: sealed_clean_batch_reconciles_read_only (sealed), refused_ambiguous_transactions_return_needs_review (refused / needs_review), bookkeeper-clean-batch (sealed), bookkeeper-ambiguous-needs-review (refused / needs_review)",
+    "dogfood command: runx skill hkaaki/bookkeeper@sha-67b50fed5091 --registry https://api.runx.ai --inputs input.json --json --receipt-dir receipts",
+    "receipt id: sha256:1da25f975eebf5901f70bdb53cc18071385257f83f7f11f8fd8a8276de443aac",
+    "receipt_ref: runx:receipt:sha256:1da25f975eebf5901f70bdb53cc18071385257f83f7f11f8fd8a8276de443aac",
+    "runx verify verdict: valid=true via `runx verify --receipt receipts/sha256-1da25f975eebf5901f70bdb53cc18071385257f83f7f11f8fd8a8276de443aac.json --allow-local-development-signatures --json` (local CLI receipts use runtime-skeleton signatures; production verifier env is not present on this operator machine)",
+    "categorized count: 3",
+    "anomaly count: 1",
+    "reconciliation totals: matched=3 unmatched=0 status=needs_review matched_amount=2159.39 unmatched_amount=0 transaction_count=3",
+    "needs_review reason: 0 unmatched transaction(s) and 1 anomaly finding(s) require review; reasons=[out_of_period] (Staples 2026-06-28 is outside 2026-07-01 through 2026-07-31)",
+    "typed inputs used: transactions[], chart_of_accounts, prior_period",
+    "typed outputs returned: categorized[], anomalies[], reconciliation{matched,unmatched,status}",
+    "read_only: ledger_mutation=false write_count=0 writes=[] external_effects=[]",
+    "every categorized line binds to an existing chart account with confidence and reason; no GL account was invented",
+    "new user path with no private context: runx add hkaaki/bookkeeper@sha-67b50fed5091 --registry https://api.runx.ai ; write a JSON object with transactions, chart_of_accounts, and prior_period ; runx skill hkaaki/bookkeeper@sha-67b50fed5091 --registry https://api.runx.ai --inputs input.json --json --receipt-dir receipts ; runx verify --receipt <receipt.json> --allow-local-development-signatures --json"
+  ],
+  "cli": {
+    "binary": "runx-cli 0.9.0",
+    "commands": {
+      "version": "runx --version",
+      "login": "runx login --provider github --for publish --from-gh",
+      "publish": "runx registry publish /tmp/runx-bookkeeper/skills/bookkeeper/SKILL.md --registry=https://api.runx.ai",
+      "install": "runx add hkaaki/bookkeeper@sha-67b50fed5091 --registry https://api.runx.ai",
+      "harness_local": "runx harness ./skills/bookkeeper --json",
+      "dogfood": "runx skill hkaaki/bookkeeper@sha-67b50fed5091 --registry https://api.runx.ai --inputs input.json --json --receipt-dir receipts",
+      "verify": "runx verify --receipt receipts/sha256-1da25f975eebf5901f70bdb53cc18071385257f83f7f11f8fd8a8276de443aac.json --allow-local-development-signatures --json",
+      "registry_read": "runx registry read --registry https://api.runx.ai --json hkaaki/bookkeeper@sha-67b50fed5091"
+    }
+  },
+  "package": {
+    "name": "bookkeeper",
+    "owner": "hkaaki",
+    "document_version": "0.1.0",
+    "registry_version": "sha-67b50fed5091",
+    "registry_ref": "hkaaki/bookkeeper@sha-67b50fed5091",
+    "digest": "sha256:33ff95d73aff1a5a73f8a0a1e0d4ac9a11f6e2fc9010dd8358b888972d413444",
+    "source_revision": "cde68bc6960baf37f9a13b47a7c38a0c0e0fcf26"
+  },
+  "artifacts": {
+    "public_url": "https://runx.ai/x/hkaaki/bookkeeper@sha-67b50fed5091",
+    "source_url": "https://github.com/hkaaki/runx/tree/cde68bc6960baf37f9a13b47a7c38a0c0e0fcf26/skills/bookkeeper",
+    "pr_url": "https://github.com/runxhq/runx/pull/458",
+    "x_yaml": "https://raw.githubusercontent.com/hkaaki/runx/cde68bc6960baf37f9a13b47a7c38a0c0e0fcf26/skills/bookkeeper/X.yaml",
+    "skill_md": "https://raw.githubusercontent.com/hkaaki/runx/cde68bc6960baf37f9a13b47a7c38a0c0e0fcf26/skills/bookkeeper/SKILL.md",
+    "verification_json": "https://hkaaki.github.io/ash-agent-work/frantic-89-bookkeeper/verification.json",
+    "evidence_json": "https://hkaaki.github.io/ash-agent-work/frantic-89-bookkeeper/evidence.json",
+    "receipt_ref": "runx:receipt:sha256:1da25f975eebf5901f70bdb53cc18071385257f83f7f11f8fd8a8276de443aac",
+    "report": "https://hkaaki.github.io/ash-agent-work/frantic-89-bookkeeper/report.md"
+  },
+  "hosted_harness": {
+    "status": "passed",
+    "checks_passed": 4,
+    "checks_failed": 0,
+    "case_names": [
+      "sealed_clean_batch_reconciles_read_only",
+      "refused_ambiguous_transactions_return_needs_review",
+      "bookkeeper-clean-batch",
+      "bookkeeper-ambiguous-needs-review"
+    ],
+    "evidence_url": "https://runx.ai/x/hkaaki/bookkeeper@sha-67b50fed5091#harness"
+  },
+  "dogfood": {
+    "package": "hkaaki/bookkeeper@sha-67b50fed5091",
+    "input": {
+      "transactions": [
+        {
+          "id": "op-aws-july",
+          "date": "2026-07-03",
+          "description": "AWS monthly cloud hosting",
+          "amount": -186.42,
+          "currency": "USD"
+        },
+        {
+          "id": "op-stripe-july",
+          "date": "2026-07-18",
+          "description": "Stripe sales payout",
+          "amount": 2400.0,
+          "currency": "USD"
+        },
+        {
+          "id": "op-staples-june",
+          "date": "2026-06-28",
+          "description": "Staples office supplies",
+          "amount": -54.19,
+          "currency": "USD"
+        }
+      ],
+      "chart_of_accounts": [
+        {
+          "code": "4000",
+          "name": "Sales Revenue",
+          "type": "revenue",
+          "keywords": [
+            "stripe",
+            "sales",
+            "payout"
+          ]
+        },
+        {
+          "code": "6100",
+          "name": "Cloud Hosting",
+          "type": "expense",
+          "keywords": [
+            "aws",
+            "cloud",
+            "hosting"
+          ]
+        },
+        {
+          "code": "6200",
+          "name": "Office Supplies",
+          "type": "expense",
+          "keywords": [
+            "staples",
+            "office",
+            "supplies"
+          ]
+        }
+      ],
+      "prior_period": {
+        "start_date": "2026-07-01",
+        "end_date": "2026-07-31"
+      }
+    },
+    "command": "runx skill hkaaki/bookkeeper@sha-67b50fed5091 --registry https://api.runx.ai --inputs input.json --json --receipt-dir receipts",
+    "receipt_ref": "runx:receipt:sha256:1da25f975eebf5901f70bdb53cc18071385257f83f7f11f8fd8a8276de443aac",
+    "verify_verdict": {
+      "valid": true,
+      "schema": "runx.verify_verdict.v1",
+      "receipt_id": "sha256:1da25f975eebf5901f70bdb53cc18071385257f83f7f11f8fd8a8276de443aac",
+      "signature_mode": "local-development",
+      "command": "runx verify --receipt receipts/sha256-1da25f975eebf5901f70bdb53cc18071385257f83f7f11f8fd8a8276de443aac.json --allow-local-development-signatures --json"
+    },
+    "harness_cases": [
+      {
+        "name": "sealed_clean_batch_reconciles_read_only",
+        "status": "sealed"
+      },
+      {
+        "name": "refused_ambiguous_transactions_return_needs_review",
+        "status": "refused"
+      },
+      {
+        "name": "bookkeeper-clean-batch",
+        "status": "sealed"
+      },
+      {
+        "name": "bookkeeper-ambiguous-needs-review",
+        "status": "refused"
+      }
+    ],
+    "output_metrics": {
+      "categorized_count": 3,
+      "anomaly_count": 1,
+      "reconciliation": {
+        "matched": 3,
+        "matched_amount": 2159.39,
+        "period": {
+          "end_date": "2026-07-31",
+          "start_date": "2026-07-01"
+        },
+        "status": "needs_review",
+        "transaction_count": 3,
+        "unmatched": 0,
+        "unmatched_amount": 0,
+        "unmatched_transactions": []
+      },
+      "needs_review": {
+        "reason": "0 unmatched transaction(s) and 1 anomaly finding(s) require review",
+        "reasons": [
+          "out_of_period"
+        ],
+        "required": true
+      },
+      "read_only": {
+        "external_effects": [],
+        "ledger_mutation": false,
+        "statement": "reconciliation artifact only; no journal entry was posted",
+        "write_count": 0,
+        "writes": []
+      }
+    }
+  }
+}
