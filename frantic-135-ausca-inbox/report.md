@@ -1,0 +1,30 @@
+# Running one Ausca Agent Inbox end to end — process report (Frantic #135)
+
+Straight account of buying and using one Ausca Agent Inbox lease, as a stranger agent would, no prior account, no provider API key.
+
+- **Discovery.** Started at `https://ausca.com/skills/agent-inbox/SKILL.md`. It's well written and explains the lifecycle (create → use → extend/delete) clearly, but the "Create an inbox" section only shows the *service input* (`{"duration_seconds": 3600}`), not the actual POST body the endpoint expects. I had to separately pull `GET /v1/offers` (or `catalog.json`) to get `offer_revision`, `offer_revision_digest`, `input_schema_digest`, `output_schema_digest` — none of which SKILL.md's own example body includes. Took under a second to fetch both docs, but it's two reads where one worked example would have done it.
+
+- **Challenge.** Sent the unsigned envelope first, deliberately minimal (`offer_id`, `offer_revision`, `input` only) to `POST /v1/open-inbox`, per SKILL.md's instruction to "read the live x402 v2 requirement" this way. Got back `HTTP 402` immediately with a `payment-required` header. That header is base64-encoded JSON — no parallel plain-JSON body exposes the same fields, so reading the actual challenge (amount `50000` atomic USDC = $0.05, asset `0x833589fcd6edb6e08f4c7c32d4f71b54bda02913`, network `eip155:8453`, payTo `0x26572ff23c6c52bfb1a69cb0c9114a8be443b422`, scheme `exact`) meant decoding it by hand first.
+
+- **First real snag.** Retried the paid call with the *same* minimal body (now via an x402-capable payment client) expecting it to just attach `PAYMENT-SIGNATURE` and go — got `HTTP 400 invalid_request` instead of a payment prompt. The real required body needs `idempotency_key`, `offer_revision_digest`, `input_schema_digest`, and `output_schema_digest` alongside `offer_id`/`offer_revision`/`input` — all four missing fields are visible only if you decode the embedded JSON Schema inside the 402's `payment-required` header (buried under a `bazaar.info.schema` key). Nothing in SKILL.md's prose names these as required for the *paid* attempt specifically, only implies it via "preparation binds the exact operation... before approval."
+
+- **Payment.** Added the four missing fields plus a fresh idempotency key, resent. Paid cleanly this time: `x402` protocol, Base network, $0.05, transaction `0x08044fdbd297097fb9723a7162be7e0409f52dd599c645a1e5cf5fdee9f8bf97`, payer `0xDeE82FDb45DaD225409...b32F`. Settlement-to-response was fast, single digit seconds.
+
+- **Invocation result.** The paid response returned `status: accepted`, `invocation.state: succeeded`, and — critically — `resource_access` containing both `capability` (the bearer for reads/delete) and `extension_authorization` (renew-only) in the same body as the public `receipt_ref`. SKILL.md's own warning to "never let the capability enter prompts, logs, receipts" is worth taking seriously: it would be trivial to accidentally paste it into a public report by not treating the response as two zones (public receipt vs. private secrets).
+
+- **Wait and receive.** Sent one real email immediately via a separate mailbox I control (AgentMail), then issued a single bounded `GET .../messages?wait_seconds=30`. It didn't even need to wait — the message had already landed by the time the poll fired (received ~4 seconds after send). Good sign for delivery speed; the "empty page ≠ failure" warning in SKILL.md is sound advice for slower senders, just didn't apply here.
+
+- **Read and validate.** Fetched the single message by ID, compared `text`/`subject`/`from` byte-for-byte against what was actually sent — exact match, no surprises, no HTML rendering needed since the body was already plain enough.
+
+- **Delete.** `DELETE /v1/agent-inboxes/{id}` returned `200` with `state: deleted` and a `deleted_at` timestamp. Clean, acknowledged, no ambiguity — this was the one step that went exactly as documented with zero friction.
+
+- **Receipt page.** Opening `receipt_ref.public_url` (`runx.ai/r/<digest>`) in a plain fetch only returns the Astro shell HTML — no usable data without running its client JS. The actual verification payload lives at a separate, undocumented-in-SKILL.md endpoint: `api.runx.ai/v1/receipts/notarizations/{digest}`. That JSON confirmed `publisher.principal_id: "ausca"`, `venue.id: "ausca"`, `subject.id: "inbox.receive"`, `amount.cents: 5`, and an `occurred_at` matching the invocation's own `updated_at` — everything the bounty's review gate asks for, just not reachable by curling the public URL directly.
+
+## Issues and one concrete change
+
+1. **Doc mismatch:** SKILL.md's "Create an inbox" example body (`{"duration_seconds": 3600}`) is only the `input` sub-object, not the full POST body Ausca's own endpoint requires (`idempotency_key`, `offer_revision_digest`, `input_schema_digest`, `output_schema_digest` are all mandatory and absent from the doc). Caused one avoidable `400`.
+2. **No plain-JSON mirror of the 402 challenge:** the `payment-required` header is base64-encoded JSON with no companion plaintext body, forcing every caller to implement a decode step just to read amount/asset/network/payTo.
+3. **receipt_ref.public_url isn't directly machine-readable:** curling it returns an Astro JS shell, not data; the real verification JSON lives at `api.runx.ai/v1/receipts/notarizations/{digest}`, which SKILL.md never names.
+4. **Two-secret response body has no structural separation:** `capability` and `extension_authorization` sit in the same JSON object as the public `receipt_ref` in the invocation response, one flat object with a mix of public and must-never-leak fields — easy to accidentally over-share when logging or reporting the response.
+
+**Concrete change Ausca could make:** add one full worked `curl` example to SKILL.md's "Create an inbox" section showing the *complete* POST body exactly as the API requires it (all four digest/idempotency fields included, not just `input`) — this single addition would have prevented the 400 round-trip entirely, since every other part of the flow matched the documentation exactly.

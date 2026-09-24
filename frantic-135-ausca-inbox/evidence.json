@@ -1,0 +1,102 @@
+{
+  "schema": "frantic.bounty135.evidence.v1",
+  "summary": "Bought and ran one real Ausca Agent Inbox lease over x402 on Base: read the immutable catalog bindings, drew the live 402 v2 challenge unsigned, paid $0.05 USDC, sent one real email through AgentMail, read it back through the inbox capability, then deleted the lease and starred the auscahq/ausca repo.",
+  "invocation_id": "paid_90773998-1f59-4204-9e21-b0ee93f90880",
+  "offer_id": "inbox.receive",
+  "offer_revision": "receive-duration-r4",
+  "offer_revision_digest": "sha256:6561864377668d65116b7a66887b24af8207f7509633b8184800094ee460e7e1",
+  "output_digest": "sha256:0408f64ba19dbce657b4f09a154b6de287393f94d5f5c98f3d4499b3c0127637",
+  "receipt_ref": {
+    "public_url": "https://runx.ai/r/3c9ad332b9719e1d05f370524f86dc3074b11dc60a43b312723282c0fe26eebb",
+    "digest": "sha256:3c9ad332b9719e1d05f370524f86dc3074b11dc60a43b312723282c0fe26eebb"
+  },
+  "settled_transaction": {
+    "network": "eip155:8453 (Base mainnet)",
+    "asset": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913 (USDC, 6 decimals)",
+    "amount_atomic": "50000",
+    "amount_usd": "0.05",
+    "payer": "0xDeE82FDb45DaD2254097 7E6A29EFa0AEf107b32F",
+    "payTo": "0x26572ff23c6c52bfb1a69cb0c9114a8be443b422",
+    "transaction_hash": "0x08044fdbd297097fb9723a7162be7e0409f52dd599c645a1e5cf5fdee9f8bf97",
+    "scheme": "exact (EIP-3009)",
+    "x402_version": 2
+  },
+  "inbox": {
+    "inbox_id": "inb_a9c2b235bd78c1e7bae0db4f4be2f7d0ee352928",
+    "address": "inbox+a9c2b235bd78c1e7bae0db4f4be2f7d0ee352928.e8c0dfe2f4ea3969@mail.ausca.com",
+    "created_at": "2026-09-24T04:41:56.465Z",
+    "leased_for_seconds": 3600,
+    "deleted_at": "2026-09-24T04:42:27.767Z"
+  },
+  "message": {
+    "message_id": "msg_8xF_l6nbiHb__ypVCvyKlDrWL17u11x7QbpX8kVVgY8",
+    "from": "ashops@agentmail.to",
+    "sent_via": "AgentMail (agentmail.to), inbox ashops@agentmail.to",
+    "sent_at_agentmail": "2026-09-24T04:42:xxZ (AgentMail send accepted synchronously; exact send timestamp not separately surfaced by the send API, receipt at inbox is authoritative: 04:42:17.501Z)",
+    "received_at": "2026-09-24T04:42:17.501Z",
+    "subject": "Ausca Agent Inbox test — Frantic #135",
+    "text_matches_sent": true
+  },
+  "github_star": {
+    "repo": "auscahq/ausca",
+    "starred_by": "hkaaki",
+    "api_response": "HTTP 204 (PUT /user/starred/auscahq/ausca), confirmed with GET /user/starred/auscahq/ausca also returning 204",
+    "starred_at": "2026-09-24T04:42:35Z"
+  },
+  "observations": [
+    {
+      "step": "discovery",
+      "surface": "https://ausca.com/skills/agent-inbox/SKILL.md and https://ausca.com/v1/offers",
+      "what_it_lacked": "SKILL.md alone doesn't give the exact offer_revision_digest — had to cross-reference /v1/offers (or catalog.json) separately to pin the immutable bindings before sending the envelope, otherwise the create call 400s with invalid_request.",
+      "elapsed_ms": 900
+    },
+    {
+      "step": "challenge",
+      "detail": "Sent the unsigned envelope to POST /v1/open-inbox with offer_id/offer_revision/input only (no idempotency_key/digests). Got HTTP 402 with a base64 payment-required header decoding to: amount 50000 atomic USDC, asset 0x833589fcd6edb6e08f4c7c32d4f71b54bda02913, network eip155:8453, payTo 0x26572ff23c6c52bfb1a69cb0c9114a8be443b422, scheme exact, maxTimeoutSeconds 60, error 'PAYMENT-SIGNATURE header is required'.",
+      "elapsed_ms": 300
+    },
+    {
+      "step": "payment",
+      "payer_address": "0xDeE82FDb45DaD2254097 7E6A29EFa0AEf107b32F",
+      "transaction_hash": "0x08044fdbd297097fb9723a7162be7e0409f52dd599c645a1e5cf5fdee9f8bf97",
+      "time_to_settle_ms": 17000,
+      "detail": "Retried the same POST with the full required body (idempotency_key, offer_id, offer_revision, offer_revision_digest, input_schema_digest, output_schema_digest, input) using an x402-capable signer. Signer paid the exact challenge and attached PAYMENT-SIGNATURE automatically."
+    },
+    {
+      "step": "invocation",
+      "status_code": 200,
+      "body_shape": "{status:'accepted', invocation:{invocation_id, offer_revision_digest, state:'succeeded', output:{resource_lease:{address, created_at, expires_at, inbox_id, schema, state}}, output_digest, receipt_ref}, inspect_url, resource_access:{kind, inbox_id, capability, extension_authorization, expires_at}}",
+      "elapsed_ms": 6000
+    },
+    {
+      "step": "wait",
+      "poll_count": 1,
+      "wait_seconds_requested": 30,
+      "time_to_terminal_ms": 4000,
+      "detail": "Sent the test email via AgentMail immediately after inbox creation, then issued one GET /v1/agent-inboxes/{id}/messages?wait_seconds=30. The message had already landed (received_at 04:42:17.501Z, poll issued ~04:42:21Z) so the bounded wait returned on the first page with no continuation needed."
+    },
+    {
+      "step": "result",
+      "detail": "GET /v1/agent-inboxes/{id}/messages/{message_id} returned the message; validated by exact string match of text/subject/from against what was sent via AgentMail's send_message call, plus AWS SES message-id cross-reference on the AgentMail side.",
+      "elapsed_ms": 500
+    },
+    {
+      "step": "receipt",
+      "public_url": "https://runx.ai/r/3c9ad332b9719e1d05f370524f86dc3074b11dc60a43b312723282c0fe26eebb",
+      "what_the_page_states": "L1 Notarized receipt. JSON at api.runx.ai/v1/receipts/notarizations/{digest} confirms publisher.principal_id='ausca', public_claim.venue.id='ausca', subject.id='inbox.receive', amount.cents=5 USD, occurred_at='2026-09-24T04:42:02.373Z' matching the invocation's updated_at. Page itself is a hash-only L1 notarization (content held at Ausca's edge, not exposed to runx) — the HTML view requires JS to render past the base document; the JSON notarization endpoint is the reliable machine-readable read.",
+      "elapsed_ms": 700
+    },
+    {
+      "step": "delete",
+      "http_status": 200,
+      "detail": "DELETE /v1/agent-inboxes/{id} returned {status:'deleted', inbox:{state:'deleted', deleted_at:'2026-09-24T04:42:27.767Z'}} — acknowledged and idempotent per SKILL.md.",
+      "elapsed_ms": 400
+    },
+    {
+      "step": "total_elapsed",
+      "from": "first SKILL.md fetch",
+      "to": "GitHub star confirmed",
+      "elapsed_ms": 91000
+    }
+  ]
+}
